@@ -1,2 +1,7 @@
 Flask>=0.12
-twilio~=6.0.0
+twilio==8.7.0
+python-dotenv==1.0.0
+vosk==0.3.45
+flask-sock==0.7.0
+simple-websocket==0.10.1 
+pyngrok==7.0.0
