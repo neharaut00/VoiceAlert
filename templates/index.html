@@ -1,0 +1,48 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Transcription Display</title>
+</head>
+<body>
+    <div id="transcription"></div>
+    <h1>{{ websocket_url }}</h1>
+    <h1>Live transcriptions are</h1>
+    <div id="log"></div>
+    <script>
+        const log = (text, color) => {
+            document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;
+          };
+        const socket = new WebSocket('{{ websocket_url }}');
+        socket.addEventListener('transcription', ev => {
+          log('<<< ' + ev.data, 'blue');
+        });
+       
+      </script>
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask transcription</title>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+   
+</head>
+<body>
+    <div id="transcription-container">
+       
+    <script>
+      const socket = io.connect('{{ websocket_url }}');
+      socket.on('connect', function() {
+          socket.emit('message', { data: 'Client connected!' });
+      });
+      socket.on('stream', function(data) {
+          // Update the transcription container with the received transcription data
+          var transcriptionContainer = document.getElementById('transcription-container');
+          transcriptionContainer.innerHTML += data.text;
+      });
+    </script>
+</body>
+</html>
