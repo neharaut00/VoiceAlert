@@ -1,0 +1,39 @@
+{
+    "name": "voice-alert",
+    "description": "",
+    "keywords": [
+      "twilio",
+      "speech-to-text"
+    ],
+    "version": "0.0.1",
+    "author": "https://github.com/neharaut00",
+    "homepage": "",
+    "engines": {
+      "node": "18.x"
+    },
+    "scripts": {
+      "start": "node app.js",
+      "lint": "eslint app.js lib/*.js",
+      "unittest": "mocha lib/*.spec.js",
+      "test": "npm run lint && npm audit && npm run unittest",
+      "coverage": "nyc npm run unittest"
+    },
+    "dependencies": {
+      "@google-cloud/speech": "^6.0.2",
+      "dotenv": "^16.3.1",
+      "express": "^4.18.1",
+      "express-ws": "^5.0.2",
+      "loglevel": "^1.8.0",
+      "ws": "^8.14.2"
+    },
+    "devDependencies": {
+      "chai": "^4.3.6",
+      "eslint": "^8.18.0",
+      "mocha": "^10.0.0",
+      "nyc": "^15.1.0",
+      "sinon": "^14.0.0",
+      "supertest": "^6.2.3",
+      "superwstest": "^2.0.2"
+    }
+  }
+  
