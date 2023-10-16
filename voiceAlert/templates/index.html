@@ -1,34 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask-SocketIO Example</title>
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
-</head>
-<body>
-    <h1>Flask-SocketIO Example</h1>
-    <div id="transcription">
-    <btn id="join-btn">Join</btn>
-    </div>
-
+<!doctype html>
+<html>
+  <head>
+    <title>Flask-Sock Demo with Blueprints</title>
+  </head>
+  <body>
+    <h1>Flask-Sock Demo with Blueprints</h1>
+    <p>Type <b>close</b> to end the connection.</p>
+    <div id="log"></div>
+    <br>
+    <form id="form">
+      <label for="text">Input: </label>
+      <input type="text" id="text" autofocus>
+    </form>
     <script>
-       const socket = io({autoConnect: false});
-       document.getElementById("join-btn").addEventListener("click", function() {
-        
+      const log = (text, color) => {
+        document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;
+      };
 
-        socket.connect();
-
-        socket.on("connect", function() {
-            document.getElementById("transcription").innerHTML = "Connected";
-        })
-        socket.on("stream", function(data) {
-            document.getElementById("transcription").innerHTML = data;
-        })
-    })
-
-
+      const socket = new WebSocket('wss://' + location.host + '/echo');
+      socket.addEventListener('message', ev => {
+        log('<<< ' + ev.data, 'blue');
+      });
+      socket.addEventListener('close', ev => {
+        log('<<< closed');
+      });
+      document.getElementById('form').onsubmit = ev => {
+        ev.preventDefault();
+        const textField = document.getElementById('text');
+        log('>>> ' + textField.value, 'red');
+        socket.send(textField.value);
+        textField.value = '';
+      };
     </script>
-</body>
+  </body>
 </html>
