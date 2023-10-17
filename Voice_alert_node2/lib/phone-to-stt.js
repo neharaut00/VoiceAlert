@@ -1,15 +1,16 @@
 // external dependencies
 const nodeWs = require('ws');
 const Transform = require('stream').Transform;
-const { IamAuthenticator } = require('ibm-watson/auth');
-const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
+// const { IamAuthenticator } = require('ibm-watson/auth');
+// const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
+const speech = require('@google-cloud/speech');
 // internal dependencies
 const sttStore = require('./stt-store');
 const uiUpdater = require('./ui-updater');
 const config = require('./config/stt');
 // logging
 const log = require('loglevel');
-
+require("dotenv").config();
 
 
 /**
@@ -51,16 +52,17 @@ function init() {
  *  client library that will be used.
  */
 function createSpeechToTextClient() {
-    return new SpeechToTextV1({
-        // this isn't used until the first time we start
-        //  streaming audio to it so you don't know if
-        //  the credentials are valid until the first
-        //  call goes through
-        authenticator: new IamAuthenticator({
-            apikey: process.env.STT_API_KEY,
-        }),
-        serviceUrl: process.env.STT_INSTANCE_URL
-    });
+    // return new SpeechToTextV1({
+    //     // this isn't used until the first time we start
+    //     //  streaming audio to it so you don't know if
+    //     //  the credentials are valid until the first
+    //     //  call goes through
+    //     authenticator: new IamAuthenticator({
+    //         apikey: process.env.STT_API_KEY,
+    //     }),
+    //     serviceUrl: process.env.STT_INSTANCE_URL
+    // });
+    return new speech.SpeechClient();
 }
 
 
@@ -120,9 +122,11 @@ function handleIncomingWSConnection(ws, req) {
     });
 
 
-    const recognizeStreamClient = (who === 'caller') ?
-        callerStt.recognizeUsingWebSocket(config.get().STT_CONFIG) :
-        receiverStt.recognizeUsingWebSocket(config.get().STT_CONFIG);
+    const recognizeStreamClient = (who === 'caller') 
+        // ? callerStt.recognizeUsingWebSocket(config.get().STT_CONFIG) :
+        // receiverStt.recognizeUsingWebSocket(config.get().STT_CONFIG);
+        ? callerStt.streamingRecognize(config.get().STT_CONFIG) : receiverStt.streamingRecognize(config.get().STT_CONFIG);
+
 
     // start from the twilio audio stream
     mediaStreamClient

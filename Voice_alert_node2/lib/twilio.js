@@ -17,7 +17,8 @@ let HOSTNAME;
  */
 function init() {
     // log current config to help with debugging
-    HOSTNAME = config.getHostname();
+  // HOSTNAME = config.getHostname();
+  HOSTNAME = "localhost";
     log.debug('Twilio setup:', { HOSTNAME });
 }
 
@@ -33,8 +34,10 @@ function init() {
  *   hosted by this application
  */
 function generateTwimlBin(receiverPhoneNumber) {
+  log.debug('generateTwimlBin', { receiverPhoneNumber })
     return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
+
   <Start>
     <Stream url="wss://${HOSTNAME}/ws/caller"   track="inbound_track"/>
   </Start>
@@ -42,7 +45,7 @@ function generateTwimlBin(receiverPhoneNumber) {
     <Stream url="wss://${HOSTNAME}/ws/receiver" track="outbound_track"/>
   </Start>
   <Dial>
-    +${receiverPhoneNumber}
+    +91${receiverPhoneNumber}
   </Dial>
   <Pause length="40"/>
 </Response>`;

@@ -6,8 +6,9 @@ const sttStore = require('./stt-store');
 const phoneToStt = require('./phone-to-stt');
 const uiUpdater = require('./ui-updater');
 const twilio = require('./twilio');
-const nlu = require('./nlu');
-const nluConfig = require('./config/nlu');
+const log = require('loglevel');
+// const nlu = require('./nlu');
+// const nluConfig = require('./config/nlu');
 
 
 /**
@@ -65,16 +66,16 @@ function getCallTranscript(req, res) {
  * @param {Express.Request}  req - expressjs request object
  * @param {Express.Response} res - expressjs response object
  */
-function getCallSpeakerAnalysis(req, res) {
-    nlu.analyze(req.params.timestamp, req.params.who)
-        .then((emotion) => {
-            // set cache header to prevent the browser asking
-            //  to update this too frequently
-            res.set({'Cache-Control' : 'max-age=' + nluConfig.get().CACHING.CACHE_TIME_SECONDS });
-            // return the response
-            res.json({ emotion });
-        });
-}
+// function getCallSpeakerAnalysis(req, res) {
+//     nlu.analyze(req.params.timestamp, req.params.who)
+//         .then((emotion) => {
+//             // set cache header to prevent the browser asking
+//             //  to update this too frequently
+//             res.set({'Cache-Control' : 'max-age=' + nluConfig.get().CACHING.CACHE_TIME_SECONDS });
+//             // return the response
+//             res.json({ emotion });
+//         });
+// }
 
 
 
@@ -92,7 +93,7 @@ function createTwimlBin(req, res) {
     //
     // cf. https://www.twilio.com/docs/voice/twiml/gather#action
     const receiverPhoneNumber = req.query.Digits;
-
+    log.debug('createTwimlBin', { receiverPhoneNumber })
     if (!receiverPhoneNumber) {
         return res.status(400).json({ error: 'Missing required query parameter "Digits"' });
     }
@@ -140,7 +141,7 @@ function setup(app) {
     // API for retrieving calls, transcriptions, and analyses
     app.get('/api/calls',                          getCalls);
     app.get('/api/calls/:timestamp/transcript',    getCallTranscript);
-    app.get('/api/calls/:timestamp/analysis/:who', getCallSpeakerAnalysis);
+    // pap.get('/api/calls/:timestamp/analysis/:who', getCallSpeakerAnalysis);
 
 
     // support for text payloads
