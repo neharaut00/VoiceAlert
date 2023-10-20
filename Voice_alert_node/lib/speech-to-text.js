@@ -2,7 +2,8 @@ const WebSocket = require("ws");
 const speech = require("@google-cloud/speech");
 require("dotenv").config();
 const sttStore = require('./stt-store');
-const uiUpdater = require('./ui-updater');
+// const { endCall } = require("../../Voice_alert_node2/lib/ui-updater");
+// const uiUpdater = require('./setup');
 const client = new speech.SpeechClient();
 const request = {
   config: {
@@ -15,9 +16,32 @@ const request = {
   interimResults: true,
 };
 let currentCallStartTime;
-function newCall() {
+
+function newCall(wss) {
   currentCallStartTime = Date.now();
-  uiUpdater.newCall(currentCallStartTime);
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(
+        JSON.stringify({
+          event: "new-call",
+          timestamp: currentCallStartTime,
+        })
+      );
+    }
+  });
+}
+
+function endCall(wss) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(
+        JSON.stringify({
+          event: "end-call",
+          timestamp: currentCallStartTime,
+        })
+      );
+    }
+  });
 }
 
 const startWebSocketServer = (server) => {
@@ -33,14 +57,14 @@ const startWebSocketServer = (server) => {
       switch (msg.event) {
         case "connected":
           console.log(`A new call has connected.`);
-          newCall();
+          newCall(wss);
           break;
         case "start":
           console.log(`Starting Media Stream ${msg.streamSid}`);
           recognizeStream = client
             .streamingRecognize(request)
             .on("error", console.error)
-            .on("data", (data) => { handleSttData(data); });
+            .on("data", (data) => { handleSttData(data, wss); });
           break;
         case "media":
           recognizeStream.write(msg.media.payload);
@@ -48,6 +72,7 @@ const startWebSocketServer = (server) => {
         case "stop":
           console.log(`Call Has Ended`);
           recognizeStream.destroy();
+          endCall(wss);
           break;
       }
     });
@@ -56,19 +81,39 @@ const startWebSocketServer = (server) => {
   return wss;
 };
 
-function handleSttData(msg) {
+function handleSttData(msg, wss) {
   if (containsTranscript(msg)) {
       const transcription = {
           timestamp: Date.now(),
           transcript: msg.results[0].alternatives[0].transcript,
       };
       if (msg.results[0].isFinal) {
-          sttStore.addFinalTranscription(currentCallStartTime, transcription);
-          uiUpdater.newFinalTranscription(currentCallStartTime, transcription);
+        sttStore.addFinalTranscription(currentCallStartTime, transcription);
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                event: "final-transcription",
+                text: msg.results[0].alternatives[0].transcript,
+              })
+            );
+          }
+        });
+          // uiUpdater.newFinalTranscription(currentCallStartTime, transcription);
       }
       else {
-          sttStore.updateLiveTranscription(currentCallStartTime, transcription);
-          uiUpdater.newInterimTranscription(currentCallStartTime, transcription);
+        sttStore.updateLiveTranscription(currentCallStartTime, transcription);
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                event: "interim-transcription",
+                text: msg.results[0].alternatives[0].transcript,
+              })
+            );
+          }
+        });
+          // uiUpdater.newInterimTranscription(currentCallStartTime, transcription);
       }
   }
 }

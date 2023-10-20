@@ -10,10 +10,10 @@ function addFinalTranscription(callTimestamp, transcription) {
     }
     calls[callTimestamp].history.push(transcription);
     calls[callTimestamp].live[transcription] = { ...transcription, transcript: '' };
-    // console.log("Added final transcription:");
-    // console.log("Call Timestamp:", callTimestamp);
-    // console.log("Transcription:", transcription);
-    // console.log("Call Record:", calls[callTimestamp]);
+    console.log("Added final transcription:");
+    console.log("Call Timestamp:", callTimestamp);
+    console.log("Transcription:", transcription);
+    console.log("Call Record:", calls[callTimestamp]);
 }
 
 function updateLiveTranscription(callTimestamp, transcription) {
@@ -32,7 +32,7 @@ function getTranscript(callTimestamp) {
         prepareNewCallRecord(callTimestamp);
     }
     console.log("Get Transcript for Call Timestamp:", callTimestamp);
-    console.log("Call Record:", transcript);
+    // console.log("Call Record:", transcript);
     return calls[callTimestamp];
 }
 
