@@ -21,10 +21,10 @@ function updateLiveTranscription(callTimestamp, transcription) {
         prepareNewCallRecord(callTimestamp);
     }
     calls[callTimestamp].live[transcription] = transcription;
-    // console.log("Updated live transcription:");
-    // console.log("Call Timestamp:", callTimestamp);
-    // console.log("Transcription:", transcription);
-    // console.log("Call Record:", calls[callTimestamp]);
+    console.log("Updated live transcription:");
+    console.log("Call Timestamp:", callTimestamp);
+    console.log("Transcription:", transcription);
+    console.log("Call Record:", calls[callTimestamp]);
 }
 
 function getTranscript(callTimestamp) {

@@ -1,4 +1,14 @@
 {
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "lint": "eslint app.js lib/*.js",
+    "unittest": "mocha lib/*.spec.js",
+    "test": "npm run lint && npm audit && npm run unittest",
+    "coverage": "nyc npm run unittest"
+  },
   "dependencies": {
     "@google-cloud/speech": "^6.0.2",
     "dotenv": "^16.3.1",

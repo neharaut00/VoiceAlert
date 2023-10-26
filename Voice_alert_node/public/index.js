@@ -1,9 +1,9 @@
-window.onload = function () {
-    const reloadInterval = 2000;
+// window.onload = function () {
+//     const reloadInterval = 2000;
 
-    setInterval(function() {
-        location.reload();
-    }, reloadInterval);
+//     setInterval(function() {
+//         location.reload();
+//     }, reloadInterval);
     
     let pageSelectedCall;
 
@@ -54,9 +54,9 @@ window.onload = function () {
     }
 
     function registerForUpdates() {
-        // const ws = new WebSocket('wss://' + window.location.host + '/ws/updates');
+        const ws = new WebSocket('wss://' + window.location.host + '/ws/updates');
         console.log('registerForUpdates')
-        const ws = new WebSocket("ws://localhost:8080");
+       
         ws.addEventListener('message', (wsMessage) => {
             const callEvent = JSON.parse(wsMessage.data);
             if (callEvent.event === 'new-call') {
@@ -163,4 +163,4 @@ window.onload = function () {
 
     updateCallsList();
     registerForUpdates();
-}
+// }
