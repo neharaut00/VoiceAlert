@@ -5,8 +5,10 @@ const server = require("http").createServer(app);
 const path = require("path");
 const sttStore = require("./lib/stt-store")
 const speechToText = require("./lib/speech-to-text");
-const uiUpdater = require("./lib/ui-updater")
+const uiUpdater = require("./lib/ui-updater");
+const { db } = require("./lib/firebase");
 
+app.set("view engine", "ejs");
 
 function getCalls(req, res) {
   console.log('getCalls')
@@ -34,9 +36,23 @@ app.get('/api/calls', getCalls);
 
 app.get('/api/calls/:timestamp/transcript', getCallTranscript);
 
+app.get('/callHistory', async (req, res) => {
+  console.log('callHistory')
+  const callRef = db.collection('calls')
+  const response = await callRef.get()
+  const data = []
+  response.forEach(doc => {
+    data.push(doc.data())
+    console.log(doc.data());
+  });
+  res.render("callhistory", { data });
+  // console.log('callRef', callRef)
+ })
+
 app.use(express.text());
 
 app.use(express.static("public"));
+
 // app.get("/", (req, res) => res.sendFile(path.join(__dirname, "/index.html")));
 
 app.post("/", (req, res) => {

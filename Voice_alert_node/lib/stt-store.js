@@ -119,5 +119,4 @@ module.exports = {
 
     getTranscript,
     getAllCalls,
-    getCallHistory
 };
