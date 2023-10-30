@@ -1,22 +1,22 @@
 .call {
-    border: thin black solid;
     margin: 10px;
     padding: 10px;
-    cursor: pointer;
+    text-align: center;
+    background-color:rgba(53, 49, 238, 0.2);
 }
 
-.call .call-id {
-    font-size: 9px;
+.call h6 {
+    font-size: 16px;
+    margin: 0;
     margin-bottom: 10px;
 }
 
-.call .timestamp {
-    font-size: 18px;
+.call .call-time{
+    font-size: 25px;
+    /* margin-bottom: 10px; */
 }
 
-.call.selected {
-    background-color: #465050;
-    color: white;
-    border: none;
-    cursor: default;
+.call .call-date{
+    font-size: 16px;
+    margin-bottom: 10px;
 }

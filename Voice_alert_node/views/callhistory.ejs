@@ -2,18 +2,63 @@
 <html>
 <head>
   <title>Database Data</title>
+  <link href="index.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+  <!-- <script src="./index.js"></script> -->
 </head>
 <body>
-  <h1>Database Data</h1>
-  <ul>
-    <% data.forEach(item => { %>
-      <li><%= item.call_started %> - <%= item.call_ended %></li>
-      <ul>
-        <% item.history.forEach(historyItem => { %>
-          <li><%= historyItem.timestamp %> - <%= historyItem.transcript %></li>
+  <div class="app-window">
+    <div class="sidebar">
+        <h2>Voice Alert</h2>
+        <ul>
+            <li class="item"><a href="/"><i class="fas fa-phone"></i>    Ongoing Call</a></li>
+            <li class="item selected"><a href="/callHistory"><i class="fas fa-address-card"></i>    Calls History</a></li>
+            <li class="item"><a href="/callHistory"><i class="fas fa-project-diagram"></i>    Analytics</a></li>
+
+            
+        </ul> 
+        
+    </div>
+    
+    <div class="app-column wide">
+      <div class="calls-history">
+      <table>
+        <tr>
+          <th>Call Started</th>
+          <th>Call Ended</th>
+          <th>Duration</th>
+          <th>Emotion</th>
+          <th>Transcription</th>
+        </tr>
+        <% data.forEach(item => { %>
+            <% 
+
+        const started = new Date(item.call_started);
+        const ended = new Date(item.call_ended);
+        
+      
+        const durationInMilliseconds = ended - started;
+        
+
+        const hours = Math.floor(durationInMilliseconds / 3600000);
+        const minutes = Math.floor((durationInMilliseconds % 3600000) / 60000);
+        const seconds = Math.floor((durationInMilliseconds % 60000) / 1000);
+ 
+        const formattedDuration = hours + ":" + minutes + ":" + seconds;
+        %>
+          <tr>
+            <td><span class="table-time"><%= new Date(item.call_started).toLocaleTimeString() %></span class="table-date"> <br> <span> <%= new Date(item.call_started).toLocaleDateString("en-GB") %></span></td>
+            <td><span class="table-time"><%= new Date(item.call_ended).toLocaleTimeString() %></span class="table-date"> <br> <span> <%= new Date(item.call_ended).toLocaleDateString("en-GB") %></span></td>
+            <td><%= formattedDuration %></td>
+            <td><%= item.emotion %></td>
+            <td>
+              <a href="/downloadPDF?callStarted=<%= item.call_started %>" >Download Transcription</a>
+            </td>
+          </tr>
         <% }); %>
-      </ul>
-    <% }); %>
-  </ul>
+      </table>
+    </div>
+  </div>
+   </div> 
 </body>
 </html>

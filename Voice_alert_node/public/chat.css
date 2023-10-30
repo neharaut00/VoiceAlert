@@ -1,5 +1,5 @@
 :root {
-    --current-messages-font-size: 13px;
+    --current-messages-font-size: 20px;
     --current-messages-inner-padding: 8px;
     --current-messages-outer-padding: 5px;
     --current-messages-margin: 5px;
@@ -24,7 +24,7 @@
 
 .chat-history {
     position: absolute;
-    overflow-y: scroll;
+    overflow-y: hidden;
     left: 0; right: 0; top: 0; bottom: var(--current-messages-height);
     padding: 10px;
 }
@@ -39,22 +39,41 @@
 .chat-history .chat-message {
     width: 75%;
     margin-bottom: 20px;
-    color: white;
+    color: black;
 }
 .chat-history .chat-message{
     margin-left: calc(25% - 20px);
 }
+
+.chat-history .chat-message .transcript{
+    font-weight: 700;
+}
+
+.chat-history .chat-message .date{
+    font-weight: 500;
+    display: inline-block;
+    font-size: 15px;
+}
+
+.chat-history .chat-message .timestamp{
+    font-weight: 500;
+    padding-left: 10px;
+    display: inline-block;
+    font-size: 15px;
+}
+
 .current-messages {
     padding: var(--current-messages-outer-padding);
 }
 .current-messages .chat-message {
     white-space: nowrap;
     overflow-y: hidden;
+    font-weight: 700;
     direction: rtl;
+    margin-left: calc(25% - 20px);
     text-overflow: ellipsis;
     padding: var(--current-messages-inner-padding);
-    margin: var(--current-messages-margin);
-    color: #777777;
+    color:black;
     font-size: var(--current-messages-font-size);
     min-height: 15px;
 }
@@ -65,15 +84,10 @@
 }
 
 .chat-history .chat-message{
-    background-color: darkblue;
+    background-color: rgba(53, 49, 238, 0.2);;
 }
-/* .chat-history .chat-message.receiver {
-    background-color: darkgreen;
-} */
+
 .current-messages .chat-message {
     color: black;
-    background-color: lightblue;
+   
 }
-/* .current-messages .chat-message.receiver {
-    background-color: lightgreen;
-} */

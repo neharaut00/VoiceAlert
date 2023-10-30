@@ -6,23 +6,32 @@
 //     }, reloadInterval);
     
     let pageSelectedCall;
-
+let mostRecentCall;
+    
+let items = document.querySelectorAll(".item")
+            items.forEach(item => {
+            item.addEventListener("click", event => {
+                const current = document.querySelector('.selected')
+                current.classList.remove('selected')
+                item.classList.add("selected")
+                
+            })
+            
+            })
     function updateCallsList() {
         console.log('updateCallsList')
 
         fetchJson('/api/calls')
             .then((data) => {
-                // add the calls to the page
-                const callsListDiv = document.getElementById('calls-list');
-                data.calls.forEach((call) => {
-                    const callDiv = createCallHtml(call);
-                    callsListDiv.appendChild(callDiv);
-                });
-
                 // select the most recent call
                 if (data.calls.length > 0) {
-                    selectCall(data.calls[data.calls.length - 1].timestamp);
+                    mostRecentCall = data.calls[data.calls.length - 1].timestamp;
+                    selectCall(mostRecentCall);
                 }
+                
+              
+               
+                
             });
     }
 
@@ -32,6 +41,11 @@
             .then((data) => {
                 // store the timestamp for the currently-selected call
                 pageSelectedCall = timestamp;
+
+                const calldate = document.getElementById('call-date');
+                calldate.innerHTML = new Date(pageSelectedCall).toLocaleDateString("en-GB");
+                const calltime = document.getElementById('call-time');
+                calltime.innerHTML = new Date(pageSelectedCall).toLocaleTimeString();
 
                 // remove any previous chat that is displayed
                 const callHistoryDiv = document.getElementById('chat-history');
@@ -60,12 +74,9 @@
         ws.addEventListener('message', (wsMessage) => {
             const callEvent = JSON.parse(wsMessage.data);
             if (callEvent.event === 'new-call') {
-                // add the new call to the list
-                const callsListDiv = document.getElementById('calls-list');
-                callsListDiv.appendChild(createCallHtml(callEvent));
-
                 // select the new call
                 selectCall(callEvent.timestamp);
+                
             }
             else if (callEvent.event === 'interim-transcription') {
                 // update the UI if the transcription is for the
@@ -78,6 +89,10 @@
                 // update the UI if the transcription is for the
                 //  currently selected phone call
                 if (callEvent.callTimestamp === pageSelectedCall) {
+                    const calldate = document.getElementById('call-date');
+                    calldate.innerHTML = new Date(pageSelectedCall).toLocaleDateString("en-GB");
+                    const calltime = document.getElementById('call-time');
+                    calltime.innerHTML = new Date(pageSelectedCall).toLocaleTimeString();
                     // add the new message to the UI
                     const callHistoryDiv = document.getElementById('chat-history');
                     const messageDiv = createChatHistoryMessage(callEvent.transcription);
@@ -99,34 +114,6 @@
                 console.error('Unexpected event', callEvent);
             }
         });
-    }
-
-
-    function createCallHtml(call) {
-        console.log('createCallHtml')
-        const callDiv = document.createElement('div');
-        callDiv.classList.add('call');
-        callDiv.onclick = function () {
-            selectCall(call.timestamp);
-        };
-
-        const callId = document.createElement('div');
-        callId.classList.add('call-id');
-        callId.innerHTML = 'call started at:';
-
-        const callTimestamp = document.createElement('div');
-        callTimestamp.classList.add('timestamp');
-        callTimestamp.innerHTML = new Date(call.timestamp).toLocaleTimeString();
-
-        const callDate = document.createElement('div');
-        callDate.classList.add('date');
-        callDate.innerHTML = new Date(call.timestamp).toLocaleDateString("en-GB");
-        
-        callDiv.appendChild(callId);
-        callDiv.appendChild(callDate);
-        callDiv.appendChild(callTimestamp);
-
-        return callDiv;
     }
 
     function createChatHistoryMessage(message) {

@@ -1,28 +1,137 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700,500');
 body {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  background-color: aliceblue;
+  background-color: white;
   margin: 0;
+  font-family: "Montserrat", Times, serif;
 }
 
 .app-window {
   display: flex;
   flex-wrap: wrap;
-  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden
 }
 .app-column {
   padding: 0;
   margin: 5px;
   background-color: white;
-  border: thin black solid;
+  border: thin #ebebeb solid;
   position: relative;
 }
 .app-column.small {
-  flex-grow: 1;
-}
-.app-column.medium {
-  flex-grow: 3;
+  flex-grow: 5;
 }
 .app-column.wide {
-  flex-grow: 9;
+  flex-grow: 10;
   padding: 10px;
+  overflow-y: hidden;
+}
+
+.app-window .sidebar{
+  flex-grow: 1;
+  background: #ebebeb;
+  padding: 20px 0px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+
+}
+
+.app-window .sidebar h2{
+  color: #3531ee;
+  font-weight: 700;
+  font-size: 36px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.app-window .sidebar ul{
+  padding: 0px;
+  margin: 0px;
+  text-align: center;
+}
+
+.app-window .sidebar ul li{
+  padding: 20px;
+  font-size: 20px;
+  list-style-type: none
+}    
+
+.app-window .sidebar ul li a{
+  text-decoration: none;
+  paddding: 5px;
+  color: #8F8F8F;
+  display: block;
+}
+
+.app-window .sidebar ul li a .fas{
+  width: 25px;
+}
+
+.app-window .sidebar ul li:hover{
+  background-color: #3531ee;
+}
+    
+.app-window .sidebar ul li:hover a{
+  color: #fff;
+}
+
+.app-window .sidebar ul li.selected{
+  background-color: rgba(53, 49, 238, 0.2);
+  padding: 20px;
+  font-size: 20px;
+  list-style-type: none
+}
+    
+.app-window .sidebar ul li.selected a{
+  color: black;
+  text-decoration: none;
+  paddding: 5px;
+  display: block;
+  font-weight: 500;
+}
+
+.calls-history {
+  overflow-y: auto;
+  margin: 20px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  
+}
+
+.calls-history table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  
+}
+
+.calls-history th,
+.calls-history td {
+  /* border: 1px solid #ccc; */
+  padding: 20px;
+  
+}
+
+.calls-history th {
+  background-color:rgba(53, 49, 238, 0.2);
+}
+
+.calls-history td {
+  border-bottom: 1px solid #ccc;
+}
+
+.calls-history button {
+  background-color: #3531ee;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+}
+
+.table-time{
+  margin-bottom: 10px;
+  font-weight: 500;
+  font-size: 20px;
 }

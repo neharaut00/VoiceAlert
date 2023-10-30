@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Database Data</title>
+</head>
+<body>
+  <h1>Database Data</h1>
+  <ul>
+    <% data.forEach(item => { %>
+      <li><%= item.call_started %> - <%= item.call_ended %></li>
+      <ul>
+        <% item.history.forEach(historyItem => { %>
+          <li><%= historyItem.timestamp %> - <%= historyItem.transcript %></li>
+        <% }); %>
+      </ul>
+    <% }); %>
+  </ul>
+</body>
+</html>
