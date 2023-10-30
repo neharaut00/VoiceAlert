@@ -118,7 +118,12 @@
         callTimestamp.classList.add('timestamp');
         callTimestamp.innerHTML = new Date(call.timestamp).toLocaleTimeString();
 
+        const callDate = document.createElement('div');
+        callDate.classList.add('date');
+        callDate.innerHTML = new Date(call.timestamp).toLocaleDateString("en-GB");
+        
         callDiv.appendChild(callId);
+        callDiv.appendChild(callDate);
         callDiv.appendChild(callTimestamp);
 
         return callDiv;
@@ -134,10 +139,15 @@
         timestamp.classList.add('timestamp');
         timestamp.innerHTML = new Date(message.timestamp).toLocaleTimeString();
 
+        const callDate = document.createElement('div');
+        callDate.classList.add('date');
+        callDate.innerHTML = new Date(message.timestamp).toLocaleDateString("en-GB");
+
         const transcript = document.createElement('div');
         transcript.classList.add('transcript');
         transcript.innerHTML = message.transcript;
 
+        messageDiv.appendChild(callDate);
         messageDiv.appendChild(timestamp);
         messageDiv.appendChild(transcript);
 

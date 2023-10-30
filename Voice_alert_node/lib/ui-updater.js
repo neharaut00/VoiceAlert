@@ -5,8 +5,6 @@ const browserConnections = [];
 function handleIncomingWSConnection(ws, req) {
     console.log('received new ws connection from UI');
     browserConnections.push(ws);
-    console.log("browserConnections");
-    console.log(browserConnections);
     ws.on('close', () => {
         log.debug('closing connection to UI');
         const idx = browserConnections.indexOf(ws);
@@ -36,8 +34,7 @@ function newFinalTranscription(callTimestamp, transcription) {
         callTimestamp,
         transcription
     });
-    console.log("final-transcription")
-    console.log(transcription);
+    
 }
 
 function newInterimTranscription(callTimestamp, transcription) {
@@ -46,8 +43,8 @@ function newInterimTranscription(callTimestamp, transcription) {
         callTimestamp,
         transcription
     });
-    console.log("interim-transcription")
-    console.log(transcription);
+    
+   
 }
 
 function sendNotification(notification) {

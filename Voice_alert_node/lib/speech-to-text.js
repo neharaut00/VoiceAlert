@@ -19,6 +19,7 @@ const request = {
 };
 
 let currentCallStartTime;
+let currentCallEndTime;
 
 function init() { 
   console.log('Speech to Text setup')
@@ -33,13 +34,7 @@ function newCall() {
 
 function handleIncomingWSConnection(ws, req) {
   console.log('received new ws connection from twilio');
-  // console.log(req.originalUrl);
-  console.log('ws');
-  console.log(ws)
-
-    // newCall();
-  console.log("New Connection Initiated");
-
+  
   let recognizeStream = null;
 
   ws.on("message", function incoming(message) {
@@ -63,7 +58,8 @@ function handleIncomingWSConnection(ws, req) {
       case "stop":
         console.log(`Call Has Ended`);
         recognizeStream.destroy();
-        handleSttClose();
+        currentCallEndTime = Date.now();
+        handleSttClose(msg, currentCallEndTime);
         break;
     }
   });
@@ -149,10 +145,7 @@ function handleSttData(msg) {
         timestamp: Date.now(),
         transcript: msg.results[0].alternatives[0].transcript,
     };
-    // let transcription;
-    // transcription = msg.results[0].alternatives[0].transcript;
-    console.log("stt transcription");
-    console.log(typeof transcription);
+    
     if (msg.results[0].isFinal) {
         sttStore.addFinalTranscription(currentCallStartTime, transcription);
         uiUpdater.newFinalTranscription(currentCallStartTime, transcription);
@@ -177,8 +170,10 @@ function handleSttError(msg) {
   log.error('stt error', { msg });
 }
 
-function handleSttClose(msg) {
+function handleSttClose(msg, currentCallEndTime) {
   log.debug('stt close', { msg });
+  sttStore.addCallEndTime(currentCallStartTime, currentCallEndTime);
+  sttStore.addToFirestore();
   uiUpdater.endCall(currentCallStartTime);
 }
 
