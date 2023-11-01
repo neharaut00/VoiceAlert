@@ -75,6 +75,13 @@ function addCallEndTime(callTimestamp, callEndTime) {
     calls[callTimestamp].call_ended = callEndTime;
 }
 
+function callStartTime(callTimestamp) {
+    if (!(callTimestamp in calls)) {
+        prepareNewCallRecord(callTimestamp);
+    }
+    calls[callTimestamp].call_started = callTimestamp;
+}
+
 function updateLiveTranscription(callTimestamp, transcription) {
     if (!(callTimestamp in calls)) {
         prepareNewCallRecord(callTimestamp);
@@ -97,7 +104,7 @@ function getTranscript(callTimestamp) {
 
 function prepareNewCallRecord(timestamp) {
     calls[timestamp] = {
-        call_started: timestamp,
+        call_started: null,
         call_ended: null,
         history: [],
         live: {
@@ -119,4 +126,5 @@ module.exports = {
 
     getTranscript,
     getAllCalls,
+    callStartTime
 };

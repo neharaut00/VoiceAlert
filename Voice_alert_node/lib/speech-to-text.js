@@ -28,6 +28,7 @@ function init() {
 
 function newCall() {
   currentCallStartTime = Date.now();
+  sttStore.callStartTime(currentCallStartTime);
   uiUpdater.newCall(currentCallStartTime);
 }
 
