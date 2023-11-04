@@ -2,18 +2,48 @@
 <html>
 <head>
   <title>Database Data</title>
+  <link href="index.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+  <!-- <script src="./index.js"></script> -->
 </head>
 <body>
-  <h1>Database Data</h1>
-  <ul>
-    <% data.forEach(item => { %>
-      <li><%= item.call_started %> - <%= item.call_ended %></li>
-      <ul>
-        <% item.history.forEach(historyItem => { %>
-          <li><%= historyItem.timestamp %> - <%= historyItem.transcript %></li>
-        <% }); %>
-      </ul>
-    <% }); %>
-  </ul>
-</body>
-</html>
+  <div class="app-window">
+    <div class="sidebar">
+        <h2>Voice Alert</h2>
+        <ul>
+            <li class="item"><a href="/"><i class="fas fa-phone"></i>    Ongoing Call</a></li>
+            <li class="item"><a href="/callHistory"><i class="fas fa-address-card"></i>    Calls History</a></li>
+            <li class="item selected"><a href="/analytics"><i class="fas fa-project-diagram"></i>    Analytics</a></li>  
+        </ul> 
+
+    </div>
+
+    <div class="app-column wide">
+    <div class="analytics-horizontal-div">
+      
+      <div class="analytics-graph-div1">
+        <div style="padding: 5px 16px;background-color: #b3b3b3;">
+         <h2>Emotion Distribution Pie Chart</h2> 
+        </div>
+          <img src="https://www.researchgate.net/publication/338988029/figure/fig1/AS:854239748292609@1580678035797/Chart-Showing-Public-Emotion-and-Sentiment-Distribution-for-APC2019.ppm" style="width:100%"/>
+      </div>
+      <div class="analytics-graph-div2">
+        <div style="padding: 5px 16px;background-color: #b3b3b3;">
+        <h2>Emotion Heatmap by Time of Day</h2> 
+      </div>
+         <img src="https://www.researchgate.net/publication/356873685/figure/fig3/AS:1169247980011533@1655781850564/Topographic-brain-activity-heatmap-Linear-relation-between-PR-for-each-emotion-state-and.ppm" style="width:100%"/>
+     </div>
+
+      
+    </div>
+    <div class="analytics-middle-div">
+      <div class="analytics-graph-div3">
+        <div style="padding: 5px 16px;background-color: #b3b3b3;">
+        <h2>Word Cloud for Keywords</h2> 
+      </div>
+        <img src="https://www.theinformationlab.co.uk/wp-content/uploads/2018/12/Sentiment.jpg" style="width:100%"/>
+      </div>
+    </div>
+    </div>
+  </body>
+  </html>

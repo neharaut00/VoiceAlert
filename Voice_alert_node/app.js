@@ -50,6 +50,18 @@ app.get('/callHistory', async (req, res) => {
   // console.log('callRef', callRef)
  })
 
+ app.get('/analytics', async (req, res) => {
+  console.log('analytics')
+  const callRef = db.collection('calls')
+  const response = await callRef.get()
+  const data = []
+  response.forEach(doc => {
+    data.push(doc.data())
+  });
+  res.render("analytics", { data });
+  // console.log('callRef', callRef)
+ })
+
 app.get('/downloadPDF', (req, res) => {
   let callData;
   const timestamp = req.query.callStarted;
