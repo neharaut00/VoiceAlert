@@ -21,6 +21,7 @@ async function addToFirestore() {
         const callTimestamp = call.call_started;
         const callEndTime = call.call_ended;
         const callHistory = call.history;
+        const callEmotionHistory = call.emotion_history;
         console.log("Call Timestamp:", callTimestamp);
         console.log("Call End Time:", callEndTime);
         console.log("Call History:", callHistory);
@@ -36,6 +37,7 @@ async function addToFirestore() {
                 call_started: callTimestamp,
                 call_ended: callEndTime,
                 history: callHistory,
+                emotion_history: callEmotionHistory
             };
 
             try {
@@ -64,6 +66,19 @@ function addFinalTranscription(callTimestamp, transcription) {
         prepareNewCallRecord(callTimestamp);
     }
     calls[callTimestamp].history.push(transcription);
+
+    const combinedTranscript = calls[callTimestamp].history
+        .map(item => item.transcript)
+        .join(' ');
+    //function call which will get us the emotion of the combined text 
+    console.log("Combined Transcript:", combinedTranscript);
+    const emotion_history = {
+        timestamp: callTimestamp,
+        transcript: combinedTranscript,
+        emotion: 'happy'
+    };
+
+    calls[callTimestamp].emotion_history.push(emotion_history);
     calls[callTimestamp].live[transcription] = { ...transcription, transcript: '' };
     console.log("Added final transcription:");
     // console.log("Call Timestamp:", callTimestamp);
@@ -107,6 +122,7 @@ function prepareNewCallRecord(timestamp) {
         call_started: null,
         call_ended: null,
         history: [],
+        emotion_history: [],
         live: {
             timestamp,
             transcript: ''

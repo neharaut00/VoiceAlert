@@ -50,7 +50,10 @@
             <td><span class="table-time"><%= new Date(item.call_started).toLocaleTimeString() %></span class="table-date"> <br> <span> <%= new Date(item.call_started).toLocaleDateString("en-GB") %></span></td>
             <td><span class="table-time"><%= new Date(item.call_ended).toLocaleTimeString() %></span class="table-date"> <br> <span> <%= new Date(item.call_ended).toLocaleDateString("en-GB") %></span></td>
             <td><%= formattedDuration %></td>
-            <td><%= item.emotion %></td>
+            <td>
+              <p>Text-based emotion: happy</p>
+              <p>Voice-based emotion: nervous</p>
+            </td>
             <td>
               <a href="/downloadPDF?callStarted=<%= item.call_started %>" >Download Transcription</a>
             </td>
