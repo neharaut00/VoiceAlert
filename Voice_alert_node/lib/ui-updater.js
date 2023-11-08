@@ -28,11 +28,12 @@ function endCall(callTimestamp) {
     });
 }
 
-function newFinalTranscription(callTimestamp, transcription) {
+function newFinalTranscription(callTimestamp, transcription, emotion) {
     sendNotification({
         event: 'final-transcription',
         callTimestamp,
         transcription,
+        emotion
         
     });
     

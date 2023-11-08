@@ -110,6 +110,9 @@ let items = document.querySelectorAll(".item")
                     // updateSpeakerAnalysis(callEvent.transcription.who);
                     // const emotion = document.getElementById('emotion');
                     // emotion.innerHTML = callEvent.emotion.emotion;
+                    console.log('emotion', callEvent.emotion.emotion)
+                    console.log('probabilities', callEvent.emotion.probabilities)
+                    updateSpeakerAnalysis(callEvent.emotion.probabilities);
                 }
             }
             else {
@@ -147,6 +150,16 @@ let items = document.querySelectorAll(".item")
         console.log('updateLiveTranscript')
         const liveDiv = document.getElementById('current-message');
         liveDiv.innerHTML = update.transcript;
+    }
+    
+    function updateSpeakerAnalysis(probailities) {
+        const metricDivs = document.querySelectorAll('.metric');
+
+        for (let i = 0; i < metricDivs.length; i++) {
+            const widthPercentage = probailities[i] + '%';
+            const barchartDiv = metricDivs[i].querySelector('.barchart .value');
+            barchartDiv.style.width = widthPercentage;
+        }
     }
 
     function fetchJson(url) {

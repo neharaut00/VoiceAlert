@@ -41,7 +41,7 @@ app.get('/api/calls/:timestamp/transcript', getCallTranscript);
 app.get('/callHistory', async (req, res) => {
   console.log('callHistory')
   const callRef = db.collection('calls')
-  const response = await callRef.get()
+  const response = await callRef.orderBy('call_started', 'desc').get();
   const data = []
   response.forEach(doc => {
     data.push(doc.data())

@@ -150,7 +150,7 @@ async function handleSttData(msg) {
     if (msg.results[0].isFinal) {
       const emotion = await sttStore.addFinalTranscription(currentCallStartTime, transcription);
       console.log("emotion", emotion);
-      uiUpdater.newFinalTranscription(currentCallStartTime, transcription);
+      uiUpdater.newFinalTranscription(currentCallStartTime, transcription, emotion);
     }
     else {
         sttStore.updateLiveTranscription(currentCallStartTime, transcription);
