@@ -108,6 +108,8 @@ let items = document.querySelectorAll(".item")
                     // update the sentiment analysis now that we
                     //  have an update to the conversation
                     // updateSpeakerAnalysis(callEvent.transcription.who);
+                    // const emotion = document.getElementById('emotion');
+                    // emotion.innerHTML = callEvent.emotion.emotion;
                 }
             }
             else {

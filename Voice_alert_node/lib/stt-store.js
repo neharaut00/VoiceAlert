@@ -1,4 +1,5 @@
 const { db } = require('./firebase.js')
+const nlu = require('./nlu.js')
 const calls = {}
 
 function getAllCalls() {
@@ -61,7 +62,7 @@ async function addToFirestore() {
 
 }
 
-function addFinalTranscription(callTimestamp, transcription) {
+async function addFinalTranscription(callTimestamp, transcription) {
     if (!(callTimestamp in calls)) {
         prepareNewCallRecord(callTimestamp);
     }
@@ -71,16 +72,18 @@ function addFinalTranscription(callTimestamp, transcription) {
         .map(item => item.transcript)
         .join(' ');
     //function call which will get us the emotion of the combined text 
-    console.log("Combined Transcript:", combinedTranscript);
+    emotion = await nlu.text_analysis(combinedTranscript);
+
     const emotion_history = {
         timestamp: callTimestamp,
         transcript: combinedTranscript,
-        emotion: 'happy'
+        emotion: emotion,
     };
 
     calls[callTimestamp].emotion_history.push(emotion_history);
     calls[callTimestamp].live[transcription] = { ...transcription, transcript: '' };
     console.log("Added final transcription:");
+    return emotion;
     // console.log("Call Timestamp:", callTimestamp);
     // console.log("Transcription:", transcription);
     // console.log("Call Record:", calls[callTimestamp]);
@@ -117,6 +120,15 @@ function getTranscript(callTimestamp) {
     return calls[callTimestamp];
 }
 
+// function getEmotionHistory(callTimestamp) {
+//     if (calls[callTimestamp]) {
+//         console.log(calls[callTimestamp].emotion_history);
+//         return calls[callTimestamp].emotion_history;
+//     } else {
+//         return null; // Return null if the call timestamp is not found
+//     }
+// }
+
 function prepareNewCallRecord(timestamp) {
     calls[timestamp] = {
         call_started: null,
@@ -135,6 +147,7 @@ module.exports = {
 
     getCallTimestamps,
     addToFirestore,
+
 
     addFinalTranscription,
     updateLiveTranscription,

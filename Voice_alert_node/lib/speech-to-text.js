@@ -140,7 +140,7 @@ function handleIncomingWSConnection(ws, req) {
 //   return wss;
 // };
 
-function handleSttData(msg) {
+async function handleSttData(msg) {
   if (containsTranscript(msg)) {
     const transcription = {
         timestamp: Date.now(),
@@ -148,8 +148,9 @@ function handleSttData(msg) {
     };
     
     if (msg.results[0].isFinal) {
-        sttStore.addFinalTranscription(currentCallStartTime, transcription);
-        uiUpdater.newFinalTranscription(currentCallStartTime, transcription);
+      const emotion = await sttStore.addFinalTranscription(currentCallStartTime, transcription);
+      console.log("emotion", emotion);
+      uiUpdater.newFinalTranscription(currentCallStartTime, transcription);
     }
     else {
         sttStore.updateLiveTranscription(currentCallStartTime, transcription);

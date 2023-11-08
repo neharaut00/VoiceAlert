@@ -32,7 +32,8 @@ function newFinalTranscription(callTimestamp, transcription) {
     sendNotification({
         event: 'final-transcription',
         callTimestamp,
-        transcription
+        transcription,
+        
     });
     
 }
