@@ -62,47 +62,83 @@ app.get('/callHistory', async (req, res) => {
   // console.log('callRef', callRef)
  })
 
-app.get('/downloadPDF', (req, res) => {
-  let callData;
+
+ app.get('/downloadPDF', async (req, res) => {
   const timestamp = req.query.callStarted;
-  
-   console.log('callStarted', timestamp)
-   const docRef = db.collection('calls').doc(timestamp);
-   docRef.get()
-  .then(docSnapshot => {
+
+  try {
+    const docSnapshot = await db.collection('calls').doc(timestamp).get();
+
     if (docSnapshot.exists) {
-      // The document exists
-      callData = docSnapshot.data();
-      console.log('Document data:', callData);
+      const callData = docSnapshot.data();
+      const callDataString = JSON.stringify(callData);
+
+      // Create a new PDF document
+      const doc = new PDFDocument();
+      const pdfStream = fs.createWriteStream('call_details.pdf');
+
+      // Pipe the PDF to a file
+      doc.pipe(pdfStream);
+
+      // Set font and font size
+      doc.font('Helvetica').fontSize(12);
+
+      // Format and add the data to the PDF
+      doc.text('Call Started: ' + new Date(callData.call_started).toLocaleString());
+      doc.text('Call Ended: ' + new Date(callData.call_ended).toLocaleString());
+
+      // Underline "Call Started" and "Call Ended"
+      doc.underline(0, 16, 90, 0, { color: 'black' });
+      doc.underline(0, 28, 88, 0, { color: 'black' });
+
+      doc.moveDown(1); // Add a blank line
+
+      doc.text('History:');
+
+      doc.moveDown(1);
+
+      // Loop through the history entries and format them
+      callData.history.forEach(entry => {
+        const timestamp = new Date(entry.timestamp).toLocaleString();
+        doc.text(`${timestamp} - ${entry.transcript}`);
+      });
+
+      doc.moveDown(1); // Add a blank line
+
+      doc.text('Emotion History:');
+
+      doc.moveDown(1);
+      // Loop through the emotion_history entries and format them
+      callData.emotion_history.forEach(emotionEntry => {
+        doc.text(`Transcript: ${emotionEntry.transcript}`);
+        // Make "Emotion" bold
+        doc.font('Helvetica-Bold');
+        doc.text(`Emotion: ${emotionEntry.emotion.emotion}`);
+        doc.font('Helvetica'); // Reset font to normal
+        doc.moveDown(1);
+      });
+
+    
+
+      // End the PDF document
+      doc.end();
+
+      // Set the response headers for downloading
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=call_details.pdf');
+
+      // Send the PDF as a response
+      pdfStream.on('finish', () => {
+        res.download('call_details.pdf');
+      });
     } else {
-      // The document does not exist
-      console.log('No document found with ID', docRef.id);
+      console.log('No document found with ID', timestamp);
+      res.status(404).send('Document not found');
     }
-  })
-  .catch(error => {
-    // Handle the error
-    console.log(error);
-  });
-  const callDataString = JSON.stringify(callData);
-   // Create a new PDF document
-  const doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream('call_details.pdf'));
-
-  // You can use the `callStarted` value in the PDF content
-  const formatedDate = new Date(timestamp).toLocaleString();
-  doc.text('Call Started: ' + formatedDate);
-  
-  doc.text(callDataString);
-
-  // Extract call details from your database and format them in the PDF
-  // Replace this with your actual data retrieval and formatting logic
-
-  // End the PDF document and send it as a response
-  doc.end();
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'attachment; filename=call_details.pdf');
-  doc.pipe(res);
-
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error occurred while generating the PDF');
+  }
 });
 
 app.use(express.text());
