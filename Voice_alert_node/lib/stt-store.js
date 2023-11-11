@@ -1,6 +1,7 @@
 const { db } = require('./firebase.js')
 const nlu = require('./nlu.js')
 const calls = {}
+const fs = require('fs');
 
 function getAllCalls() {
     return calls;
@@ -33,12 +34,17 @@ async function addToFirestore() {
         
         // If the document exists, update the data
         if (!docSnapshot.exists) {
+            // Read the wav file
+            const wavFilePath = __dirname + `/${id}.wav`;
+            const wavFileBuffer = fs.readFileSync(wavFilePath);
+        
             // Document does not exist, add it
             const callData = {
                 call_started: callTimestamp,
                 call_ended: callEndTime,
                 history: callHistory,
-                emotion_history: callEmotionHistory
+                emotion_history: callEmotionHistory,
+                wavFile: wavFileBuffer.toString('base64'),
             };
 
             try {
@@ -46,21 +52,47 @@ async function addToFirestore() {
             console.log(`Data added for ID ${id}`);
             } catch (error) {
             console.error("Error adding data for ID " + id, error);
+            }finally {
+                // Delete the local copy of the wav file after it's added to the database
+                fs.unlinkSync(wavFilePath);
+                console.log(`Local copy deleted for ID ${id}`);
             }
         }
         else {
             console.log(`Document with ID ${id} already exists, skipping.`);
         }
-        // for(let i = 0; i < callHistory.length; i++) {
-        //     const timestamp = callHistory[i].timestamp;
-        //     const transcript = callHistory[i].transcript;
-        //     console.log("Timestamp:", timestamp);
-        //     console.log("Transcript:", transcript);
-        // }
+    
      }
 
 
 }
+
+async function getVoiceEmotion(callTimestamp) {
+    //change typeof callTimestamp to string
+    const callTimestampString = callTimestamp.toString();
+    const callRef = db.collection('calls').doc(callTimestampString);
+    let wavFile = null;
+
+    try {
+        const docSnapshot = await callRef.get();
+
+        if (docSnapshot.exists) {
+            wavFile = docSnapshot.data().wavFile;
+        } 
+    } catch (error) {
+        console.error("Error getting document:", error);
+    }
+
+    voiceEmotion = await nlu.voice_analysis(wavFile);
+    try {
+        await callRef.update({ voice_emotion: voiceEmotion });
+        console.log(`Voice emotion added/updated for ID ${callTimestamp}`);
+    } catch (error) {
+        console.error("Error updating voice_emotion for ID " + callTimestamp, error);
+    }
+    
+
+ }
 
 async function addFinalTranscription(callTimestamp, transcription) {
     if (!(callTimestamp in calls)) {
@@ -84,9 +116,6 @@ async function addFinalTranscription(callTimestamp, transcription) {
     calls[callTimestamp].live[transcription] = { ...transcription, transcript: '' };
     console.log("Added final transcription:");
     return emotion;
-    // console.log("Call Timestamp:", callTimestamp);
-    // console.log("Transcription:", transcription);
-    // console.log("Call Record:", calls[callTimestamp]);
 }
 
 function addCallEndTime(callTimestamp, callEndTime) {
@@ -105,10 +134,7 @@ function updateLiveTranscription(callTimestamp, transcription) {
         prepareNewCallRecord(callTimestamp);
     }
     calls[callTimestamp].live[transcription] = transcription;
-    // console.log("Updated live transcription:");
-    // console.log("Call Timestamp:", callTimestamp);
-    // console.log("Transcription:", transcription);
-    // console.log("Call Record:", calls[callTimestamp]);
+    
 }
 
 function getTranscript(callTimestamp) {
@@ -116,18 +142,9 @@ function getTranscript(callTimestamp) {
         prepareNewCallRecord(callTimestamp);
     }
     console.log("Get Transcript for Call Timestamp:", callTimestamp);
-    // console.log("Call Record:", transcript);
     return calls[callTimestamp];
 }
 
-// function getEmotionHistory(callTimestamp) {
-//     if (calls[callTimestamp]) {
-//         console.log(calls[callTimestamp].emotion_history);
-//         return calls[callTimestamp].emotion_history;
-//     } else {
-//         return null; // Return null if the call timestamp is not found
-//     }
-// }
 
 function prepareNewCallRecord(timestamp) {
     calls[timestamp] = {
@@ -155,5 +172,7 @@ module.exports = {
 
     getTranscript,
     getAllCalls,
-    callStartTime
+    callStartTime,
+
+    getVoiceEmotion
 };

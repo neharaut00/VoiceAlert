@@ -54,7 +54,7 @@ function handleIncomingWSConnection(ws, req) {
           .streamingRecognize(request)
           .on("error", (msg) => { handleSttError(msg); })
           .on("data", (data) => { handleSttData(data); });
-          ws.wstream = fs.createWriteStream(__dirname + `/${Date.now()}.wav`, { encoding: 'binary' });
+          ws.wstream = fs.createWriteStream(__dirname + `/${currentCallStartTime}.wav`, { encoding: 'binary' });
           ws.wstream.write(Buffer.from([
             0x52,0x49,0x46,0x46,0x62,0xb8,0x00,0x00,0x57,0x41,0x56,0x45,0x66,0x6d,0x74,0x20,
             0x12,0x00,0x00,0x00,0x07,0x00,0x01,0x00,0x40,0x1f,0x00,0x00,0x80,0x3e,0x00,0x00,
@@ -144,25 +144,13 @@ function handleSttError(msg) {
   log.error('stt error', { msg });
 }
 
-function handleSttClose(msg, currentCallEndTime) {
+async function handleSttClose(msg, currentCallEndTime) {
   log.debug('stt close', { msg });
   sttStore.addCallEndTime(currentCallStartTime, currentCallEndTime);
-  sttStore.addToFirestore();
+  await sttStore.addToFirestore();
   uiUpdater.endCall(currentCallStartTime);
+  await sttStore.getVoiceEmotion(currentCallStartTime);
 }
 
 
 module.exports = { init, handleIncomingWSConnection };
-// {
-//   console.log(data.results[0].alternatives[0].transcript);
-//   wss.clients.forEach((client) => {
-//     if (client.readyState === WebSocket.OPEN) {
-//       client.send(
-//         JSON.stringify({
-//           event: "interim-transcription",
-//           text: data.results[0].alternatives[0].transcript,
-//         })
-//       );
-//     }
-//   });
-// }

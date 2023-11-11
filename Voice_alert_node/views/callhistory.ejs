@@ -52,7 +52,7 @@
             <td><%= formattedDuration %></td>
             <td>
               <p>Text-based emotion:<%=  item.emotion_history[item.emotion_history.length - 1].emotion.emotion %></p>
-              <p>Voice-based emotion: nervous</p>
+              <p><span>Voice-based emotion: <%=  item.voice_emotion.emotion %></span> (<%=  item.voice_emotion.percentage.toFixed(2) %>) </p>
             </td>
             <td>
               <a href="/downloadPDF?callStarted=<%= item.call_started %>" >Download Transcription</a>

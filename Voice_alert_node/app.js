@@ -113,10 +113,15 @@ app.get('/callHistory', async (req, res) => {
         doc.text(`Transcript: ${emotionEntry.transcript}`);
         // Make "Emotion" bold
         doc.font('Helvetica-Bold');
-        doc.text(`Emotion: ${emotionEntry.emotion.emotion}`);
+        doc.text(`Text based Emotion: ${emotionEntry.emotion.emotion}`);
         doc.font('Helvetica'); // Reset font to normal
         doc.moveDown(1);
+        
       });
+      doc.font('Helvetica-Bold');
+      doc.text(`Voice based Emotion: ${callData.voice_emotion.emotion} with ${callData.voice_emotion.percentage}% confidence`);
+      doc.font('Helvetica'); // Reset font to normal
+      doc.moveDown(1);
 
     
 
