@@ -4,6 +4,7 @@ const WebSocket = require("ws");
 // import * as tf from '@tensorflow/tfjs';
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const moment = require('moment');
 const server = require("http").createServer(app);
 const path = require("path");
 const sttStore = require("./lib/stt-store")
@@ -51,16 +52,44 @@ app.get('/callHistory', async (req, res) => {
  })
 
  app.get('/analytics', async (req, res) => {
-  console.log('analytics')
-  const callRef = db.collection('calls')
-  const response = await callRef.get()
-  const data = []
-  response.forEach(doc => {
-    data.push(doc.data())
+  try {
+    const callRef = db.collection('calls');
+    const response = await callRef.get();
+    const data = [];
+
+    response.forEach((doc) => {
+      data.push(doc.data());
+    });
+
+    // Provide your custom labels here
+    const customLabels = ['angry', 'sad'];
+
+    // Process voice emotions with custom labels
+    const emotionsData = processVoiceEmotions(data.map(item => item.voice_emotion?.emotion), customLabels);
+
+    res.render('analytics', { emotionsData });
+  } catch (error) {
+    console.error('Error retrieving analytics data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+ function processVoiceEmotions(voiceEmotions, customLabels) {
+  const emotionCount = {};
+
+  voiceEmotions.forEach((emotion) => {
+    if (emotionCount[emotion]) {
+      emotionCount[emotion]++;
+    } else {
+      emotionCount[emotion] = 1;
+    }
   });
-  res.render("analytics", { data });
-  // console.log('callRef', callRef)
- })
+
+  const labels = customLabels || Object.keys(emotionCount);
+  const data = Object.values(emotionCount);
+
+  return { labels, data };
+}
 
 
  app.get('/downloadPDF', async (req, res) => {
