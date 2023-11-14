@@ -5,9 +5,25 @@
   <link href="index.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
 
   <!-- <script src="./index.js"></script> -->
+  <style>
+    /* Add your heatmap styling here */
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .cell {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <div class="app-window">
@@ -26,12 +42,27 @@
       <div id="chartContainer" style="width: 35%;">
         <canvas id="emotionChart" width="400" height="400"></canvas>
       </div>
-      
+      <h1>Emotion Heatmap</h1>
+      <div class="heatmap">
+        <% Object.keys(aggregatedData).forEach((hour) => { %>
+          <% const maxEmotion = Object.keys(aggregatedData[hour]).reduce((a, b) => aggregatedData[hour][a] > aggregatedData[hour][b] ? a : b); %>
+          <div class="cell" style="background-color: getCellColor(maxEmotion, aggregatedData[hour][maxEmotion], aggregatedData);">
+            <%= hour %>:00<br>
+            <%= maxEmotion %>: <%= aggregatedData[hour][maxEmotion] %>
+          </div>
+        <% }); %>
+      </div>
 
   
     </div>
     <script>
       let chart;
+      function getCellColor(emotion, count, aggregatedData) {
+      const maxCount = Math.max(...Object.values(aggregatedData).map(hourData => hourData[emotion] || 0));
+      const colorScale = d3.scaleLinear().domain([0, maxCount]).range(['#ffffff', '#ff0000']);
+      console.log('Color Scale:', colorScale(count));
+      return colorScale(count);
+    }
       document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('emotionChart').getContext('2d');
         const labels = JSON.parse`<%-JSON.stringify(emotionsData.labels)%>`;

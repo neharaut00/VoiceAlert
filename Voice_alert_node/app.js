@@ -11,6 +11,7 @@ const sttStore = require("./lib/stt-store")
 const speechToText = require("./lib/speech-to-text");
 const uiUpdater = require("./lib/ui-updater");
 const { db } = require("./lib/firebase");
+const analytics = require('./lib/analytics');
 
 app.set("view engine", "ejs");
 
@@ -62,34 +63,25 @@ app.get('/callHistory', async (req, res) => {
     });
 
     // Provide your custom labels here
-    const customLabels = ['angry', 'sad'];
+    const customLabels = ['angry', 'sad', 'neutral', 'happy', 'ps'];
 
     // Process voice emotions with custom labels
-    const emotionsData = processVoiceEmotions(data.map(item => item.voice_emotion?.emotion), customLabels);
+    const emotionsData = analytics.processVoiceEmotions(data.map(item => item.voice_emotion?.emotion), customLabels);
 
-    res.render('analytics', { emotionsData });
-  } catch (error) {
+    const aggregatedData = analytics.aggregateCallsByHour(data, customLabels);
+
+    // Extract transcripts of the last emotion history
+    const emotionTranscripts = data.map(item => analytics.extractLastEmotionHistoryTranscript(item.emotion_history)).join(' ');
+    console.log(emotionTranscripts)
+
+    res.render('analytics', { emotionsData, aggregatedData });
+  }
+  
+  catch (error) {
     console.error('Error retrieving analytics data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
-
- function processVoiceEmotions(voiceEmotions, customLabels) {
-  const emotionCount = {};
-
-  voiceEmotions.forEach((emotion) => {
-    if (emotionCount[emotion]) {
-      emotionCount[emotion]++;
-    } else {
-      emotionCount[emotion] = 1;
-    }
-  });
-
-  const labels = customLabels || Object.keys(emotionCount);
-  const data = Object.values(emotionCount);
-
-  return { labels, data };
-}
 
 
  app.get('/downloadPDF', async (req, res) => {
