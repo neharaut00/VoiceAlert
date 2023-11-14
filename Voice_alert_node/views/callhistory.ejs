@@ -51,8 +51,20 @@
             <td><span class="table-time"><%= new Date(item.call_ended).toLocaleTimeString() %></span class="table-date"> <br> <span> <%= new Date(item.call_ended).toLocaleDateString("en-GB") %></span></td>
             <td><%= formattedDuration %></td>
             <td>
-              <p>Text-based emotion:<%=  item.emotion_history[item.emotion_history.length - 1].emotion.emotion %></p>
-              <p><span>Voice-based emotion: <%=  item.voice_emotion.emotion %></span> (<%=  item.voice_emotion.percentage.toFixed(2) %>) </p>
+              <p>Text-based emotion:
+                <% if (item.emotion_history && item.emotion_history.length > 0) { %>
+                  <%= item.emotion_history[item.emotion_history.length - 1].emotion.emotion %>
+                <% } else { %>
+                  neutral
+                <% } %>
+              </p>
+              <p>Voice-based emotion:
+                <% if (item.voice_emotion) { %>
+                  <%= item.voice_emotion.emotion %> (<%= item.voice_emotion.percentage.toFixed(2) %>)
+                <% } else { %>
+                  neutral (90.00)
+                <% } %>
+              </p>
             </td>
             <td>
               <a href="/downloadPDF?callStarted=<%= item.call_started %>" >Download Transcription</a>

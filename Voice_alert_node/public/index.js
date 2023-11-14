@@ -7,6 +7,7 @@
     
     let pageSelectedCall;
 let mostRecentCall;
+let lastProbabilities;
     
 let items = document.querySelectorAll(".item")
             items.forEach(item => {
@@ -152,15 +153,32 @@ let items = document.querySelectorAll(".item")
         liveDiv.innerHTML = update.transcript;
     }
     
-    function updateSpeakerAnalysis(probailities) {
-        const metricDivs = document.querySelectorAll('.metric');
-
-        for (let i = 0; i < metricDivs.length; i++) {
-            const widthPercentage = probailities[i] + '%';
-            const barchartDiv = metricDivs[i].querySelector('.barchart .value');
-            barchartDiv.style.width = widthPercentage;
+    function updateSpeakerAnalysis(probabilities) {
+        if (probabilities) {
+            const metricDivs = document.querySelectorAll('.metric');
+    
+            for (let i = 0; i < metricDivs.length; i++) {
+                const widthPercentage = probabilities[i] + '%';
+                const barchartDiv = metricDivs[i].querySelector('.barchart .value');
+                barchartDiv.style.width = widthPercentage;
+            }
+    
+            // Update the lastProbabilities when new probabilities are received
+            lastProbabilities = probabilities;
+        } else {
+            // If no new probabilities are provided, use the last ones
+            if (lastProbabilities) {
+                const metricDivs = document.querySelectorAll('.metric');
+    
+                for (let i = 0; i < metricDivs.length; i++) {
+                    const widthPercentage = lastProbabilities[i] + '%';
+                    const barchartDiv = metricDivs[i].querySelector('.barchart .value');
+                    barchartDiv.style.width = widthPercentage;
+                }
+            }
         }
     }
+    
 
     function fetchJson(url) {
         return fetch(url)

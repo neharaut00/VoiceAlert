@@ -54,7 +54,7 @@ function processVoiceEmotions(voiceEmotions, customLabels) {
         }
       }
     });
-    // console.log('aggregatedData', aggregatedData)
+    console.log('aggregatedData', aggregatedData)
     return aggregatedData;
   }
   

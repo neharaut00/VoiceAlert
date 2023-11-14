@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Analytics</title>
   <link href="index.css" rel="stylesheet">
@@ -8,33 +9,85 @@
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
 
-  <!-- <script src="./index.js"></script> -->
   <style>
-    /* Add your heatmap styling here */
-    .heatmap {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 5px;
+    /* Define the color styles for each emotion with dynamic intensity */
+    .cell-angry {
+      background-color: rgba(255, 0, 0, 0);
     }
 
-    .cell {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
+    .cell-sad {
+      background-color: rgba(0, 0, 255, 0);
     }
+
+    .cell-neutral {
+      background-color: rgba(0, 255, 0, 0);
+    }
+
+    .cell-happy {
+      background-color: rgba(255, 255, 0, 0);
+    }
+
+    .cell-ps {
+      background-color: rgba(0, 0, 139, 0);
+    }
+
+    .cell-fear {
+      background-color: rgba(128, 0, 128, 0);
+    }
+
+    .cell-none {
+      background-color: sky-blue;
+    }
+
+    /* Additional styles for color labels */
+    .color-label {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .color-label-angry {
+      background-color: red;
+    }
+
+    .color-label-sad {
+      background-color: blue;
+    }
+
+    .color-label-neutral {
+      background-color: green;
+    }
+
+    .color-label-happy {
+      background-color: yellow;
+    }
+
+    .color-label-ps {
+      background-color: darkblue;
+    }
+
+    .color-label-fear {
+      background-color: purple;
+    }
+
+    .color-label-none {
+      background-color: skyblue;
+    }
+
+    /* ... (other styles) ... */
   </style>
 </head>
+
 <body>
   <div class="app-window">
     <div class="sidebar">
-        <h2>Voice Alert</h2>
-        <ul>
-            <li class="item"><a href="/"><i class="fas fa-phone"></i>    Ongoing Call</a></li>
-            <li class="item"><a href="/callHistory"><i class="fas fa-address-card"></i>    Calls History</a></li>
-            <li class="item selected"><a href="/analytics"><i class="fas fa-project-diagram"></i>    Analytics</a></li>  
-        </ul> 
-
+      <h2>Voice Alert</h2>
+      <ul>
+        <li class="item"><a href="/"><i class="fas fa-phone"></i> Ongoing Call</a></li>
+        <li class="item"><a href="/callHistory"><i class="fas fa-address-card"></i> Calls History</a></li>
+        <li class="item selected"><a href="/analytics"><i class="fas fa-project-diagram"></i> Analytics</a></li>
+      </ul>
     </div>
 
     <div class="app-column wide">
@@ -43,57 +96,104 @@
         <canvas id="emotionChart" width="400" height="400"></canvas>
       </div>
       <h1>Emotion Heatmap</h1>
-      <div class="heatmap">
-        <% Object.keys(aggregatedData).forEach((hour) => { %>
-          <% const maxEmotion = Object.keys(aggregatedData[hour]).reduce((a, b) => aggregatedData[hour][a] > aggregatedData[hour][b] ? a : b); %>
-          <div class="cell" style="background-color: getCellColor(maxEmotion, aggregatedData[hour][maxEmotion], aggregatedData);">
-            <%= hour %>:00<br>
-            <%= maxEmotion %>: <%= aggregatedData[hour][maxEmotion] %>
-          </div>
-        <% }); %>
+      <table>
+        <tr>
+          <td class="">12pm - 6am</td>
+          <td class="">6am - 12pm</td>
+          <td class="">12pm - 6pm</td>
+          <td class="">6pm - 12am</td>
+        </tr>
+        <% for (let row = 0; row < 6; row++) { %>
+          <tr>
+            <% for (let col = 0; col < 4; col++) { %>
+              <% const index = row * 4 + col; %>
+              <% const emotions = heatmapdata[index]; %>
+              <% const maxEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b); %>
+              <% const count = emotions[maxEmotion]; %>
+  
+                <td class="cell-<%= maxEmotion %>">
+                  <%= count %>
+                </td>
+         
+            <% } %>
+          </tr>
+        <% } %>
+      </table>
+      <div>
+        <span class="color-label color-label-angry"></span> Angry
+        <span class="color-label color-label-sad"></span> Sad
+        <span class="color-label color-label-neutral"></span> Neutral
+        <span class="color-label color-label-happy"></span> Happy
+        <span class="color-label color-label-ps"></span> PS
+        <span class="color-label color-label-fear"></span> Fear
+        <span class="color-label color-label-none"></span> None
       </div>
-
-  
     </div>
-    <script>
-      let chart;
-      function getCellColor(emotion, count, aggregatedData) {
-      const maxCount = Math.max(...Object.values(aggregatedData).map(hourData => hourData[emotion] || 0));
-      const colorScale = d3.scaleLinear().domain([0, maxCount]).range(['#ffffff', '#ff0000']);
-      console.log('Color Scale:', colorScale(count));
-      return colorScale(count);
-    }
-      document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('emotionChart').getContext('2d');
-        const labels = JSON.parse`<%-JSON.stringify(emotionsData.labels)%>`;
-        const data = JSON.parse`<%-JSON.stringify(emotionsData.data)%>`;
-        console.log('Raw Labels:', typeof(labels));
-    console.log('Raw Data:', `<%-JSON.stringify(emotionsData.labels)%>`);
-  
-        if (Array.isArray(labels)) {
-      chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.7)',
-              'rgba(54, 162, 235, 0.7)',
-              'rgba(255, 206, 86, 0.7)',
-              'rgba(75, 192, 192, 0.7)',
-              'rgba(153, 102, 255, 0.7)',
-            ],
-          }],
-        },
-      });
+  </div>
 
-      console.log('Chart:', chart);
-    } else {
-      console.error('Error: Labels is not an array.');
-    }
-  });
-      console.log('Chart:', chart);
-    </script>
-  </body>
-  </html>
+  <script>
+    let chart;
+    let MAX_COUNT;
+    
+    const heatmapdata =`<%-JSON.stringify(heatmapdata)%>`
+   
+    
+    function calculateIntensity(count) {
+    // You can customize this formula based on your preferences
+    // Here, we use a simple linear relationship, but you can experiment with other functions
+    const maxCount = MAX_COUNT;
+    const intensity = 0.3 + 0.7 * (count / 1);
+    return intensity;
+  }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      for (let row = 0; row < 6; row++) {
+        for (let col = 0; col < 4; col++) {
+          const index = row * 4 + col;
+          const emotions = heatmapdata[index];
+          const maxEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b);
+          const count = emotions[maxEmotion];
+          const cellElement = document.querySelector(`.cell-${maxEmotion}`);
+          const cellNone = document.querySelector('.cell-none');
+
+          if (count === 0) {
+            cellNone.style.backgroundColor = 'skyblue'; // or any default color for count = 0
+          } else {
+            const intensity = calculateIntensity(count);
+            const backgroundColor = cellElement.style.backgroundColor.slice(4, -1);
+            const alpha = intensity.toFixed(2);
+            cellElement.style.backgroundColor = `rgba(${backgroundColor}, ${alpha})`;
+          }
+        }
+  }
+
+      const ctx = document.getElementById('emotionChart').getContext('2d');
+      const labels = JSON.parse`<%-JSON.stringify(emotionsData.labels)%>`;
+      const data = JSON.parse`<%-JSON.stringify(emotionsData.data)%>`;
+
+      if (Array.isArray(labels)) {
+        chart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+              ],
+            }],
+          },
+        });
+      } else {
+        console.error('Error: Labels is not an array.');
+      }
+    });
+  </script>
+</body>
+
+</html>

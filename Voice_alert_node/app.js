@@ -68,13 +68,13 @@ app.get('/callHistory', async (req, res) => {
     // Process voice emotions with custom labels
     const emotionsData = analytics.processVoiceEmotions(data.map(item => item.voice_emotion?.emotion), customLabels);
 
-    const aggregatedData = analytics.aggregateCallsByHour(data, customLabels);
+    const heatmapdata = analytics.aggregateCallsByHour(data, customLabels);
 
     // Extract transcripts of the last emotion history
     const emotionTranscripts = data.map(item => analytics.extractLastEmotionHistoryTranscript(item.emotion_history)).join(' ');
     console.log(emotionTranscripts)
 
-    res.render('analytics', { emotionsData, aggregatedData });
+    res.render('analytics', { emotionsData, heatmapdata });
   }
   
   catch (error) {
