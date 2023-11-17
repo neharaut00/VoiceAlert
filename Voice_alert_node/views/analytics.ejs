@@ -8,37 +8,35 @@
   <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
-
+  <script src="https://gist.github.com/emeeks/3361332/raw/61cf57523fe8cf314333e5f60cc266351fec2017/d3.layout.cloud.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
   <style>
     /* Define the color styles for each emotion with dynamic intensity */
     .cell-angry {
-      background-color: rgba(255, 0, 0, 0);
+      background-color: rgba(255, 0, 0, 1);
     }
 
     .cell-sad {
-      background-color: rgba(0, 0, 255, 0);
+      background-color: rgba(0, 0, 255, 1);
     }
 
     .cell-neutral {
-      background-color: rgba(0, 255, 0, 0);
+      background-color: rgba(0, 255, 0, 1);
     }
 
     .cell-happy {
-      background-color: rgba(255, 255, 0, 0);
+      background-color: rgba(255, 255, 0, 1);
     }
 
     .cell-ps {
-      background-color: rgba(0, 0, 139, 0);
+      background-color: rgba(0, 0, 139, 1);
     }
 
     .cell-fear {
-      background-color: rgba(128, 0, 128, 0);
+      background-color: rgba(128, 0, 128, 1);
     }
 
-    .cell-none {
-      background-color: sky-blue;
-    }
-
+  
     /* Additional styles for color labels */
     .color-label {
       width: 20px;
@@ -110,11 +108,15 @@
               <% const emotions = heatmapdata[index]; %>
               <% const maxEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b); %>
               <% const count = emotions[maxEmotion]; %>
-  
+              <% if (count === 0) { %>
+                <td class="cell-none" style="background-color: skyblue;">
+                  <%= count %>
+                </td>
+              <% } else {%>
                 <td class="cell-<%= maxEmotion %>">
                   <%= count %>
                 </td>
-         
+              <% } %>
             <% } %>
           </tr>
         <% } %>
@@ -128,45 +130,17 @@
         <span class="color-label color-label-fear"></span> Fear
         <span class="color-label color-label-none"></span> None
       </div>
+      
+      <h1>Word Cloud</h1>
+      <div id="wordcloud-container">
+        <!-- Word cloud will be displayed here -->
+      </div>
     </div>
+
   </div>
 
   <script>
-    let chart;
-    let MAX_COUNT;
-    
-    const heatmapdata =`<%-JSON.stringify(heatmapdata)%>`
-   
-    
-    function calculateIntensity(count) {
-    // You can customize this formula based on your preferences
-    // Here, we use a simple linear relationship, but you can experiment with other functions
-    const maxCount = MAX_COUNT;
-    const intensity = 0.3 + 0.7 * (count / 1);
-    return intensity;
-  }
-
     document.addEventListener('DOMContentLoaded', function() {
-      
-      for (let row = 0; row < 6; row++) {
-        for (let col = 0; col < 4; col++) {
-          const index = row * 4 + col;
-          const emotions = heatmapdata[index];
-          const maxEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b);
-          const count = emotions[maxEmotion];
-          const cellElement = document.querySelector(`.cell-${maxEmotion}`);
-          const cellNone = document.querySelector('.cell-none');
-
-          if (count === 0) {
-            cellNone.style.backgroundColor = 'skyblue'; // or any default color for count = 0
-          } else {
-            const intensity = calculateIntensity(count);
-            const backgroundColor = cellElement.style.backgroundColor.slice(4, -1);
-            const alpha = intensity.toFixed(2);
-            cellElement.style.backgroundColor = `rgba(${backgroundColor}, ${alpha})`;
-          }
-        }
-  }
 
       const ctx = document.getElementById('emotionChart').getContext('2d');
       const labels = JSON.parse`<%-JSON.stringify(emotionsData.labels)%>`;
@@ -192,6 +166,43 @@
       } else {
         console.error('Error: Labels is not an array.');
       }
+
+  const wordcloudData =  JSON.parse(`<%- JSON.stringify(wordcloudData) %>`);
+  console.log(wordcloudData)
+  const width = 500; // Set the width of the word cloud container
+  const height = 300; // Set the height of the word cloud container
+
+  const svg = d3.select('#wordcloud-container')
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height)
+    .append('g')
+    .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+  const fontSizeScale = d3.scaleLinear()
+    .domain([0, d3.max(wordcloudData, d => d.size)])
+    .range([10, 50]); // Set the range of font sizes
+
+  const wordCloud = d3.layout.cloud()
+    .size([width, height])
+    .words(wordcloudData)
+    .padding(5)
+    .rotate(() => (Math.random() > 0.5 ? 90 : 0)) // Randomly rotate words
+    .font('Arial')
+    .fontSize(d => fontSizeScale(d.size))
+    .on('end', draw);
+
+  wordCloud.start();
+
+  function draw(words) {
+    svg.selectAll('text')
+      .data(words)
+      .enter().append('text')
+      .style('font-size', d => d.size + 'px')
+      .style('fill', (d, i) => d3.schemeCategory10[i % 10]) // Use color scheme
+      .attr('transform', d => 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')')
+      .text(d => d.text);
+  }
     });
   </script>
 </body>

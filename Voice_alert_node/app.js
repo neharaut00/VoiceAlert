@@ -3,6 +3,7 @@ const app = express();
 const WebSocket = require("ws");
 // import * as tf from '@tensorflow/tfjs';
 const PDFDocument = require('pdfkit');
+
 const fs = require('fs');
 const moment = require('moment');
 const server = require("http").createServer(app);
@@ -73,15 +74,33 @@ app.get('/callHistory', async (req, res) => {
     // Extract transcripts of the last emotion history
     const emotionTranscripts = data.map(item => analytics.extractLastEmotionHistoryTranscript(item.emotion_history)).join(' ');
     console.log(emotionTranscripts)
-
-    res.render('analytics', { emotionsData, heatmapdata });
+    // Generate word cloud using D3.js
+    const wordcloudData = generateWordCloudData(emotionTranscripts);
+    console.log(wordcloudData)
+    res.render('analytics', { emotionsData, heatmapdata, wordcloudData });
   }
   
   catch (error) {
     console.error('Error retrieving analytics data:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+ });
+
+ // Function to generate word cloud data for D3.js
+function generateWordCloudData(text) {
+  const words = text.split(' ');
+
+  // Count word frequencies
+  const wordCounts = {};
+  words.forEach(word => {
+    wordCounts[word] = (wordCounts[word] || 0) + 1;
+  });
+
+  // Convert word frequencies to an array of objects
+  const wordcloudData = Object.keys(wordCounts).map(word => ({ text: word, size: wordCounts[word] }));
+
+  return wordcloudData;
+}
 
 
  app.get('/downloadPDF', async (req, res) => {
