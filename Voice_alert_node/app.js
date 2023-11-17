@@ -64,7 +64,7 @@ app.get('/callHistory', async (req, res) => {
     });
 
     // Provide your custom labels here
-    const customLabels = ['angry', 'sad', 'neutral', 'happy', 'ps'];
+    const customLabels = ['angry', 'sad', 'neutral', 'happy', 'ps', 'fear'];
 
     // Process voice emotions with custom labels
     const emotionsData = analytics.processVoiceEmotions(data.map(item => item.voice_emotion?.emotion), customLabels);

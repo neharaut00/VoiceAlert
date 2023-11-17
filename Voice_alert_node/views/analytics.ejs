@@ -13,27 +13,33 @@
   <style>
     /* Define the color styles for each emotion with dynamic intensity */
     .cell-angry {
-      background-color: rgba(255, 0, 0, 1);
+      background-color: rgba(255, 0, 0, 0.5);
+      color: white
     }
 
     .cell-sad {
-      background-color: rgba(0, 0, 255, 1);
+      background-color: rgba(0, 0, 255, 0.5);
+      color: white
     }
 
     .cell-neutral {
-      background-color: rgba(0, 255, 0, 1);
+      background-color: rgba(0, 128, 0, 0.5);
+      color: white
     }
 
     .cell-happy {
-      background-color: rgba(255, 255, 0, 1);
+      background-color: rgba(255, 255, 0, 0.5);
+      color: black
     }
 
     .cell-ps {
-      background-color: rgba(0, 0, 139, 1);
+      background-color: skyblue;
+      color: black
     }
 
     .cell-fear {
-      background-color: rgba(128, 0, 128, 1);
+      background-color: rgba(128, 0, 128, 0.5);
+      color: white
     }
 
   
@@ -42,38 +48,70 @@
       width: 20px;
       height: 20px;
       display: inline-block;
-      margin-right: 5px;
+      margin-top: 10px;
+      margin-left: 10px;
     }
 
     .color-label-angry {
-      background-color: red;
+      background-color: rgba(255, 0, 0, 0.5);
+      color: rgba(255, 0, 0, 1);
     }
 
     .color-label-sad {
-      background-color: blue;
+      background-color: rgba(0, 0, 255, 0.5);
     }
 
     .color-label-neutral {
-      background-color: green;
+      background-color: rgba(0, 128, 0, 0.5);
     }
 
     .color-label-happy {
-      background-color: yellow;
+      background-color: rgba(255, 255, 0, 0.5);
+     
     }
 
     .color-label-ps {
-      background-color: darkblue;
+      background-color: skyblue;
+      
     }
 
     .color-label-fear {
-      background-color: purple;
+      background-color: rgba(128, 0, 128, 0.5);
+      
     }
 
     .color-label-none {
-      background-color: skyblue;
+      background-color: lightgrey;
+      opacity: 50%;
     }
+    .app-column.wide{
+  padding: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.app-column-chart {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 20px; /* Gap between columns */
+}
 
-    /* ... (other styles) ... */
+#chartContainer,
+table {
+  width: 100%;
+}
+
+/* Style for the cells in the heatmap */
+td {
+  padding: 10px; /* Add padding to the cells */
+  text-align: center;
+}
+
+/* Additional styling for the word cloud section */
+.wordcloud-container {
+  margin-top: 80px;
+  text-align: center;
+}
+
   </style>
 </head>
 
@@ -89,10 +127,14 @@
     </div>
 
     <div class="app-column wide">
+      <div class="app-column-chart">
+      <div class="pie-chart">
       <h1>Voice Emotion Pie Chart</h1>
-      <div id="chartContainer" style="width: 35%;">
+      <div id="chartContainer" style="width: 55%;">
         <canvas id="emotionChart" width="400" height="400"></canvas>
       </div>
+    </div>
+    <div class="emotion-heatmap">
       <h1>Emotion Heatmap</h1>
       <table>
         <tr>
@@ -109,7 +151,7 @@
               <% const maxEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b); %>
               <% const count = emotions[maxEmotion]; %>
               <% if (count === 0) { %>
-                <td class="cell-none" style="background-color: skyblue;">
+                <td class="cell-none" style="background-color: lightgrey; opacity: 50%;">
                   <%= count %>
                 </td>
               <% } else {%>
@@ -130,11 +172,14 @@
         <span class="color-label color-label-fear"></span> Fear
         <span class="color-label color-label-none"></span> None
       </div>
-      
+    </div>
+  </div>
+    <div class="wordcloud-container">
       <h1>Word Cloud</h1>
-      <div id="wordcloud-container">
+      <div id="word-cloud">
         <!-- Word cloud will be displayed here -->
       </div>
+    </div>
     </div>
 
   </div>
@@ -145,6 +190,14 @@
       const ctx = document.getElementById('emotionChart').getContext('2d');
       const labels = JSON.parse`<%-JSON.stringify(emotionsData.labels)%>`;
       const data = JSON.parse`<%-JSON.stringify(emotionsData.data)%>`;
+      const colors = [
+      'rgba(255, 0, 0, 0.5)',
+      'rgba(0, 0, 255, 0.5)',
+      'rgba(0, 128, 0, 0.5)',
+      'rgba(255, 255, 0, 0.5)',
+      'skyblue',
+      'rgba(128, 0, 128, 0.5)',
+    ];
 
       if (Array.isArray(labels)) {
         chart = new Chart(ctx, {
@@ -153,13 +206,7 @@
             labels: labels,
             datasets: [{
               data: data,
-              backgroundColor: [
-                'rgba(255, 99, 132, 0.7)',
-                'rgba(54, 162, 235, 0.7)',
-                'rgba(255, 206, 86, 0.7)',
-                'rgba(75, 192, 192, 0.7)',
-                'rgba(153, 102, 255, 0.7)',
-              ],
+              backgroundColor: colors,
             }],
           },
         });
@@ -172,7 +219,7 @@
   const width = 500; // Set the width of the word cloud container
   const height = 300; // Set the height of the word cloud container
 
-  const svg = d3.select('#wordcloud-container')
+  const svg = d3.select('#word-cloud')
     .append('svg')
     .attr('width', width)
     .attr('height', height)
