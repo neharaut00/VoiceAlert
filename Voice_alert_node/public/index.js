@@ -7,7 +7,7 @@
     
     let pageSelectedCall;
 let mostRecentCall;
-let lastProbabilities;
+let lastProbabilities = [];
     
 let items = document.querySelectorAll(".item")
             items.forEach(item => {
@@ -28,7 +28,14 @@ let items = document.querySelectorAll(".item")
                 if (data.calls.length > 0) {
                     mostRecentCall = data.calls[data.calls.length - 1].timestamp;
                     selectCall(mostRecentCall);
+                    lastProbabilities = JSON.parse(localStorage.getItem('lastProbabilities'));
+                    if (lastProbabilities && lastProbabilities.length > 0) {
+                        console.log('lastProbabilities')
+                        console.log(lastProbabilities)
+                        updateSpeakerAnalysis(lastProbabilities);
+                    }
                 }
+                
                 
               
                
@@ -47,6 +54,9 @@ let items = document.querySelectorAll(".item")
                 calldate.innerHTML = new Date(pageSelectedCall).toLocaleDateString("en-GB");
                 const calltime = document.getElementById('call-time');
                 calltime.innerHTML = new Date(pageSelectedCall).toLocaleTimeString();
+                probabilities = [];
+                localStorage.setItem('lastProbabilities', JSON.stringify(probabilities));
+                updateSpeakerAnalysis(lastProbabilities);
 
                 // remove any previous chat that is displayed
                 const callHistoryDiv = document.getElementById('chat-history');
@@ -60,6 +70,7 @@ let items = document.querySelectorAll(".item")
 
                 // clear the live transcript
                 updateLiveTranscript({ transcript: '' });
+                
                 // updateLiveTranscript({ who: 'receiver', transcript: ''});
 
                 // update the sentiment analysis view
@@ -77,6 +88,9 @@ let items = document.querySelectorAll(".item")
             if (callEvent.event === 'new-call') {
                 // select the new call
                 selectCall(callEvent.timestamp);
+                probabilities = [0,0,0,0,0,0,0,0];
+                localStorage.setItem('lastProbabilities', JSON.stringify(probabilities));
+                updateSpeakerAnalysis(probabilities);
                 
             }
             else if (callEvent.event === 'interim-transcription') {
@@ -153,9 +167,21 @@ let items = document.querySelectorAll(".item")
         liveDiv.innerHTML = update.transcript;
     }
     
-    function updateSpeakerAnalysis(probabilities) {
+function updateSpeakerAnalysis(probabilities) {
+    console.log('updateSpeakerAnalysis')
+    console.log('probabilities')
+    console.log(probabilities)
+    
         if (probabilities) {
             const metricDivs = document.querySelectorAll('.metric');
+             // Update the lastProbabilities when new probabilities are received
+             lastProbabilities = probabilities;
+
+             console.log('lastProbabilities')
+            console.log(lastProbabilities)
+            
+            // Store the lastProbabilities in local storage
+            localStorage.setItem('lastProbabilities', JSON.stringify(lastProbabilities));
     
             for (let i = 0; i < metricDivs.length; i++) {
                 const widthPercentage = probabilities[i] + '%';
@@ -163,20 +189,21 @@ let items = document.querySelectorAll(".item")
                 barchartDiv.style.width = widthPercentage;
             }
     
-            // Update the lastProbabilities when new probabilities are received
-            lastProbabilities = probabilities;
-        } else {
-            // If no new probabilities are provided, use the last ones
-            if (lastProbabilities) {
-                const metricDivs = document.querySelectorAll('.metric');
-    
-                for (let i = 0; i < metricDivs.length; i++) {
-                    const widthPercentage = lastProbabilities[i] + '%';
-                    const barchartDiv = metricDivs[i].querySelector('.barchart .value');
-                    barchartDiv.style.width = widthPercentage;
-                }
-            }
-        }
+           
+    } 
+    // else {
+            
+    //     // If no new probabilities are provided, use the last ones
+    //     if (lastProbabilities) {
+    //         const metricDivs = document.querySelectorAll('.metric');
+
+    //         for (let i = 0; i < metricDivs.length; i++) {
+    //             const widthPercentage = lastProbabilities[i] + '%';
+    //             const barchartDiv = metricDivs[i].querySelector('.barchart .value');
+    //             barchartDiv.style.width = widthPercentage;
+    //         }
+    //     }
+    // }
     }
     
 
