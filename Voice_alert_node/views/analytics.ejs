@@ -12,12 +12,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
   <style>
     /* Define the color styles for each emotion with dynamic intensity */
-    .cell-angry {
+    .cell-anger {
       background-color: rgba(255, 0, 0, 0.5);
       color: white
     }
 
-    .cell-sad {
+    .cell-sadness {
       background-color: rgba(0, 0, 255, 0.5);
       color: white
     }
@@ -27,12 +27,12 @@
       color: white
     }
 
-    .cell-happy {
+    .cell-joy {
       background-color: rgba(255, 255, 0, 0.5);
       color: black
     }
 
-    .cell-ps {
+    .cell-shame {
       background-color: skyblue;
       color: black
     }
@@ -41,6 +41,18 @@
       background-color: rgba(128, 0, 128, 0.5);
       color: white
     }
+
+    .cell-disgust {
+      background-color: rgba(237, 231, 225, 0.5);
+      color: black
+    }
+
+    .cell-surprise {
+      background-color: rgba(255, 192, 203, 0.5);
+      color: black
+    }
+
+
 
   
     /* Additional styles for color labels */
@@ -70,7 +82,7 @@
      
     }
 
-    .color-label-ps {
+    .color-label-shame {
       background-color: skyblue;
       
     }
@@ -80,37 +92,22 @@
       
     }
 
-    .color-label-none {
-      background-color: lightgrey;
-      opacity: 50%;
+    .color-label-disgust {
+      background-color: rgba(237, 231, 225, 0.5);
+      
     }
-    .app-column.wide{
-  padding: 20px;
-  padding-left: 40px;
-  padding-right: 40px;
-}
-.app-column-chart {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Two equal columns */
-  gap: 20px; /* Gap between columns */
-}
 
-#chartContainer,
-table {
-  width: 100%;
-}
+    .color-label-surprise {
+      background-color: rgba(255, 192, 203, 0.5);
+      
+    }
 
-/* Style for the cells in the heatmap */
-td {
-  padding: 10px; /* Add padding to the cells */
-  text-align: center;
-}
-
-/* Additional styling for the word cloud section */
-.wordcloud-container {
-  margin-top: 80px;
-  text-align: center;
-}
+    .color-label-none {
+      background-color: white;
+      opacity: 50%;
+      border: lightgrey solid 0.2px;
+    }
+   
 
   </style>
 </head>
@@ -138,20 +135,24 @@ td {
       <h1>Emotion Heatmap</h1>
       <table>
         <tr>
-          <td class="">12pm - 6am</td>
-          <td class="">6am - 12pm</td>
-          <td class="">12pm - 6pm</td>
-          <td class="">6pm - 12am</td>
+         
+          <td class="">12am - 6am</td>
+            <td class="">6am - 12pm</td>
+            <td class="">12pm - 6pm</td>
+            <td class="">6pm - 12am</td>
         </tr>
+
         <% for (let row = 0; row < 6; row++) { %>
+          
           <tr>
+            
             <% for (let col = 0; col < 4; col++) { %>
-              <% const index = row * 4 + col; %>
+              <% const index = col * 6 + row; %>
               <% const emotions = heatmapdata[index]; %>
               <% const maxEmotion = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b); %>
               <% const count = emotions[maxEmotion]; %>
               <% if (count === 0) { %>
-                <td class="cell-none" style="background-color: lightgrey; opacity: 50%;">
+                <td class="cell-none" style="background-color: white; opacity: 50%; border: lightgrey solid 0.2px">
                   <%= count %>
                 </td>
               <% } else {%>
@@ -163,13 +164,16 @@ td {
           </tr>
         <% } %>
       </table>
+   
       <div>
-        <span class="color-label color-label-angry"></span> Angry
-        <span class="color-label color-label-sad"></span> Sad
-        <span class="color-label color-label-neutral"></span> Neutral
-        <span class="color-label color-label-happy"></span> Happy
-        <span class="color-label color-label-ps"></span> PS
+        <span class="color-label color-label-happy"></span> Joy
+        <span class="color-label color-label-sad"></span> Sadness
         <span class="color-label color-label-fear"></span> Fear
+        <span class="color-label color-label-angry"></span> Anger
+        <span class="color-label color-label-surprise"></span> Surprise
+        <span class="color-label color-label-neutral"></span> Neutral
+        <span class="color-label color-label-disgust"></span> Disgust
+        <span class="color-label color-label-shame"></span> Shame
         <span class="color-label color-label-none"></span> None
       </div>
     </div>

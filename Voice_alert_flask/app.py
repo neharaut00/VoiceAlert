@@ -10,9 +10,9 @@ import io
 app = Flask(__name__)
 
 # Load the saved pipeline and model
-pipeline_file = "../ML models/model.pkl"
+pipeline_file = "../ML models/Text_Emotion_analysis.pkl"
 pipe_lr = joblib.load(pipeline_file)
-model = load_model('../ML models/speech_emotion_recg_model.h5')
+model = load_model('../ML models/speech_emotion_recg_model_updated.h5')
 
 @app.route('/predict_emotion', methods=['POST'])
 def predict_emotion():
@@ -33,6 +33,12 @@ def predict_emotion():
         percentage_probabilities = [round(prob * 100, 2) for prob in prediction_probabilities]
         print("percentage_probabilities")
         print(percentage_probabilities)
+
+         # Create a list of emotion:percentage pairs
+        emotion_percentage_pairs = [f"{emotion}:{percentage}" for emotion, percentage in zip(pipe_lr.classes_, percentage_probabilities)]
+        print("emotion_percentage_pairs")
+        print(emotion_percentage_pairs)
+        
         response = {
             'emotion': emotion,
             'probabilities': percentage_probabilities
@@ -85,11 +91,12 @@ def voice_predict():
         normalized_predictions = (predictions / np.sum(predictions)) * 100
 
         # Emotion labels
-        emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'ps', 'sad']
+        emotion_labels = ['joy', 'sadness', 'fear', 'anger', 'surprise', 'neutral', 'disgust', 'shame']
 
         # Create a dictionary to map labels to percentages
         emotion_percentages = {label: float(percentage) for label, percentage in zip(emotion_labels, normalized_predictions[0])}
-
+        for label, percentage in emotion_percentages.items():
+            print(f'{label}: {percentage}')
         voice_emotion = max(emotion_percentages, key=emotion_percentages.get)
 
         

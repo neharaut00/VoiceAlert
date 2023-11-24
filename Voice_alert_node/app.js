@@ -64,12 +64,13 @@ app.get('/callHistory', async (req, res) => {
     });
 
     // Provide your custom labels here
-    const customLabels = ['angry', 'sad', 'neutral', 'happy', 'ps', 'fear'];
+    const text_customLabels = ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'shame', 'surprise'];
+    // const voice_customLabels = ['joy', 'sadness', 'fear', 'anger', 'surprise', 'neutral', 'disgust', 'shame'];
 
     // Process voice emotions with custom labels
-    const emotionsData = analytics.processVoiceEmotions(data.map(item => item.voice_emotion?.emotion), customLabels);
+    const emotionsData = analytics.processVoiceEmotions(data.map(item => item.voice_emotion?.emotion));
 
-    const heatmapdata = analytics.aggregateCallsByHour(data, customLabels);
+    const heatmapdata = analytics.aggregateCallsByHour(data, text_customLabels);
 
     // Extract transcripts of the last emotion history
     const emotionTranscripts = data.map(item => analytics.extractLastEmotionHistoryTranscript(item.emotion_history)).join(' ');

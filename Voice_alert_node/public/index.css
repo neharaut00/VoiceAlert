@@ -232,3 +232,32 @@ body {
 .analysis.caller .data .barchart .value {
     background-color:  #3531ee;
 }
+
+
+.app-column.wide{
+  padding: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.app-column-chart {
+  display: grid;
+  grid-template-columns: 0.7fr 0.7fr; /* Two equal columns */
+  gap: 20px; /* Gap between columns */
+}
+
+#chartContainer,
+table {
+  width: 100%;
+}
+
+/* Style for the cells in the heatmap */
+td {
+  padding: 10px; /* Add padding to the cells */
+  text-align: center;
+}
+
+/* Additional styling for the word cloud section */
+.wordcloud-container {
+  margin-top: 80px;
+  text-align: center;
+}

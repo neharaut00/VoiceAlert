@@ -1,4 +1,4 @@
-function processVoiceEmotions(voiceEmotions, customLabels) {
+function processVoiceEmotions(voiceEmotions) {
     const emotionCount = {};
   
     voiceEmotions.forEach((emotion) => {
@@ -9,7 +9,7 @@ function processVoiceEmotions(voiceEmotions, customLabels) {
       }
     });
   
-    const labels = customLabels || Object.keys(emotionCount);
+    const labels = Object.keys(emotionCount);
     const data = Object.values(emotionCount);
   
     return { labels, data };
@@ -27,18 +27,21 @@ function processVoiceEmotions(voiceEmotions, customLabels) {
     return '';
   }
   
-  function aggregateCallsByHour(data, customLabels) {
+  function aggregateCallsByHour(data, text_customLabels) {
     const aggregatedData = {};
     for (let hour = 0; hour < 24; hour++) {
       aggregatedData[hour] = {};
-      customLabels.forEach((emotion) => {
+      text_customLabels.forEach((emotion) => {
         aggregatedData[hour][emotion] = 0;
       });
     }
   
     data.forEach((item) => {
       const callStarted = item.call_started;
-      const emotion = item.voice_emotion?.emotion || 'unknown'; // Change 'unknown' to a default emotion if voice emotion is not available
+      const emotion_history = item.emotion_history;
+      const emotion = emotion_history[emotion_history.length - 1].emotion.emotion; // Change 'unknown' to a default emotion if voice emotion is not available
+      //print last element of emotion_history
+      console.log('last element of emotion_history', )
   
       if (callStarted) {
         const hour = new Date(callStarted).getHours();
