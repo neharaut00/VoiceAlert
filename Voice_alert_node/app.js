@@ -160,7 +160,7 @@ function generateWordCloudData(text) {
         
       });
       doc.font('Helvetica-Bold');
-      doc.text(`Voice based Emotion: ${callData.voice_emotion.emotion} with ${callData.voice_emotion.percentage}% confidence`);
+      doc.text(`Voice based Emotion: ${callData.voice_emotion.emotion} with ${callData.voice_emotion.percentage.toFixed(2)}% confidence`);
       doc.font('Helvetica'); // Reset font to normal
       doc.moveDown(1);
 
